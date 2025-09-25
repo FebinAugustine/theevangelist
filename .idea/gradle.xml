@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="GradleMigrationSettings" migrationVersion="1" />
+  <component name="GradleSettings">
+    <option name="linkedExternalProjectsSettings">
+      <GradleProjectSettings>
+        <compositeConfiguration>
+          <compositeBuild compositeDefinitionSource="SCRIPT">
+            <builds>
+              <build path="$PROJECT_DIR$/buildlogic" name="buildlogic">
+                <projects>
+                  <project path="$PROJECT_DIR$/buildlogic" />
+                  <project path="$PROJECT_DIR$/buildlogic/convention" />
+                </projects>
+              </build>
+            </builds>
+          </compositeBuild>
+        </compositeConfiguration>
+        <option name="testRunner" value="CHOOSE_PER_TEST" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="gradleJvm" value="#GRADLE_LOCAL_JAVA_HOME" />
+        <option name="modules">
+          <set>
+            <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/app" />
+            <option value="$PROJECT_DIR$/buildlogic" />
+            <option value="$PROJECT_DIR$/buildlogic/convention" />
+            <option value="$PROJECT_DIR$/core" />
+            <option value="$PROJECT_DIR$/core/data" />
+            <option value="$PROJECT_DIR$/core/ui" />
+            <option value="$PROJECT_DIR$/di" />
+            <option value="$PROJECT_DIR$/di/data" />
+            <option value="$PROJECT_DIR$/features" />
+            <option value="$PROJECT_DIR$/features/auth" />
+            <option value="$PROJECT_DIR$/features/auth/data" />
+            <option value="$PROJECT_DIR$/features/auth/domain" />
+            <option value="$PROJECT_DIR$/features/auth/ui" />
+            <option value="$PROJECT_DIR$/features/sadb" />
+            <option value="$PROJECT_DIR$/features/sadb/data" />
+            <option value="$PROJECT_DIR$/features/sadb/domain" />
+            <option value="$PROJECT_DIR$/features/sadb/ui" />
+            <option value="$PROJECT_DIR$/features/userdashboard" />
+            <option value="$PROJECT_DIR$/features/userdashboard/data" />
+            <option value="$PROJECT_DIR$/features/userdashboard/domain" />
+            <option value="$PROJECT_DIR$/features/userdashboard/ui" />
+          </set>
+        </option>
+      </GradleProjectSettings>
+    </option>
+  </component>
+</project>
