@@ -23,9 +23,9 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
 
             // Android config
             extensions.configure<ApplicationExtension> {
+                compileSdk = 36
                 defaultConfig {
                     applicationId = "com.febin.theevangelist"
-                    compileSdk = 36
                     minSdk = 24
                     targetSdk = 36
                     versionCode = 1

@@ -18,8 +18,7 @@ internal fun configureBuildTypesDefaults(
 
             // Release build type (production)
             named("release") {
-                isMinifyEnabled = true  // Enable code shrinking
-//                isShrinkResources = true  // Enable resource shrinking
+                isMinifyEnabled = false  // Enable code shrinking
                 proguardFiles(
                     getDefaultProguardFile("proguard-android-optimize.txt"),
                     "proguard-rules.pro"  // Your custom ProGuard rules
