@@ -1,8 +1,10 @@
 package com.febin.features.auth.ui.screens
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -11,11 +13,15 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.febin.features.auth.ui.components.FormButton
 import com.febin.features.auth.ui.components.FormInput
+import com.febin.core.ui.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -39,15 +45,23 @@ fun SignupScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.surfaceVariant) // Light gray-100 like background
-            .padding(16.dp),
-        contentAlignment = Alignment.Center
+            .background(MaterialTheme.colorScheme.surface)
+            .padding(0.dp), // Light gray-100 like background
+
+        contentAlignment = Alignment.BottomCenter
     ) {
+
         Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 8.dp), // Adjusted padding for scroll
-            shape = MaterialTheme.shapes.large,
+                .padding(bottom = 0.dp) // Adjusted padding for scroll
+                .shadow(5.dp),
+            shape = RoundedCornerShape(
+                topStart = 20.dp,
+                topEnd = 20.dp,
+                bottomStart = 0.dp,  // No bottom radius
+                bottomEnd = 0.dp
+            ),
             colors = CardDefaults.cardColors(
                 containerColor = MaterialTheme.colorScheme.surface // White background for Card
             )
@@ -183,7 +197,9 @@ fun SignupScreen(
 
                 TextButton(onClick = onNavigateToSignin) {
                     Text("Already have an account? Sign In")
+                    Spacer(modifier = Modifier.height(32.dp))
                 }
+                Spacer(modifier = Modifier.height(42.dp))
             }
         }
     }
