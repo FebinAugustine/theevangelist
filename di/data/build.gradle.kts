@@ -12,5 +12,17 @@ dependencies {
     implementation(libs.koin.android)
     implementation(libs.koin.androidx.compose)
     implementation(libs.koin.core)
+//    implementation(libs.koin.androidx.viewmodel)
+
+    // Project level dependencies
+    implementation(project(":core:data"))
+    implementation(project(":features:auth:data"))
+    implementation(project(":features:auth:domain"))
+    implementation(project(":features:auth:ui"))
+
+
+    // Ktor clien
+    implementation(libs.ktor.client.core)
+
 }
     

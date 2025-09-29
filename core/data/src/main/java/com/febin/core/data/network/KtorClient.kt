@@ -1,0 +1,97 @@
+package com.febin.core.data.network
+
+import com.febin.core.data.constants.Constants
+import com.febin.core.data.local.AppPreferences
+import io.ktor.client.HttpClient
+import io.ktor.client.engine.android.Android
+import io.ktor.client.plugins.ClientRequestException
+import io.ktor.client.plugins.HttpCallValidator
+import io.ktor.client.plugins.HttpTimeout
+import io.ktor.client.plugins.HttpRequestRetry
+import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.plugins.defaultRequest
+import io.ktor.client.plugins.logging.LogLevel
+import io.ktor.client.plugins.logging.Logger
+import io.ktor.client.plugins.logging.Logging
+import io.ktor.client.request.header
+import io.ktor.client.statement.bodyAsText
+import io.ktor.http.ContentType
+import io.ktor.http.HttpHeaders
+import io.ktor.serialization.kotlinx.json.json
+import kotlinx.serialization.json.Json
+import timber.log.Timber
+import java.io.IOException
+import java.net.ConnectException
+import kotlin.math.pow
+
+
+/**
+ * Creates a fully configured Ktor HttpClient for Android.
+ * - Uses Android engine for native cookie handling.
+ * - Bearer auth with token load/refresh from AppPreferences (via AuthInterceptor).
+ * - JSON serialization, Timber logging, error validation.
+ */
+fun createHttpClient(appPreferences: AppPreferences) = HttpClient(Android) {
+    expectSuccess = true
+
+    install(ContentNegotiation) {
+        json(Json {
+            prettyPrint = true
+            isLenient = true
+            ignoreUnknownKeys = true
+        })
+    }
+
+    install(Logging) {
+        logger = object : Logger {
+            override fun log(message: String) {
+                Timber.d("Ktor => %s", message)
+            }
+        }
+        level = LogLevel.ALL  // Change to LogLevel.NONE in prod
+    }
+
+    install(HttpTimeout) {
+        requestTimeoutMillis = 30_000
+        connectTimeoutMillis = 10_000
+        socketTimeoutMillis = 30_000
+    }
+
+    install(HttpRequestRetry) {
+        retryIf { _, response -> response.status.value in 500..599 }
+        retryIf { _, response -> response.status.value == 408 }
+        retryOnExceptionIf { _, cause ->
+            cause is ConnectException || cause is IOException
+        }
+        maxRetries = 3
+        delayMillis { retryAttempt ->
+            val initialDelayMs = 1000L
+            val maximumDelayMs = 10000L
+            val backoffFactor = 2.0
+            val currentDelay = initialDelayMs * backoffFactor.pow(retryAttempt - 1)
+            currentDelay.toLong().coerceAtMost(maximumDelayMs)
+        }
+    }
+
+    // Install Authentication via the extension function
+    installAuth(appPreferences)
+
+    install(HttpCallValidator) {
+        handleResponseExceptionWithRequest { cause, _ ->
+            if (cause is ClientRequestException) {
+                val errorBody = cause.response.bodyAsText()
+                Timber.e("API Error: $errorBody")
+                throw Exception(errorBody)
+            }
+        }
+    }
+
+    defaultRequest {
+        url(Constants.BASE_URL)
+        header(HttpHeaders.ContentType, ContentType.Application.Json)
+        header(HttpHeaders.UserAgent, "TheEvangelistApp/1.0")
+    }
+}
+
+// RefreshResponseDto and auth helper functions have been moved to AuthInterceptor.kt
+

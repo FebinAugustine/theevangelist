@@ -18,6 +18,7 @@ import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -36,6 +37,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.febin.core.ui.R
 import com.febin.features.auth.ui.components.FormButton
 import com.febin.features.auth.ui.components.FormInput
@@ -164,11 +166,11 @@ fun SigninScreen(
 
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    FormButton(
-                        text = "Sign In",
-                        onClick = { onSigninClicked(email, password) },
-                        modifier = Modifier.fillMaxWidth()
-                    )
+//                    FormButton(
+//                        text = "Sign In",
+//                        onClick = { onSigninClicked(email, password) },
+//                        modifier = Modifier.fillMaxWidth()
+//                    )
 
                     TextButton(onClick = onNavigateToSignup) {
                         Text("Don't have an account? Sign Up")

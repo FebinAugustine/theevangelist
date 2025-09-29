@@ -36,6 +36,8 @@ dependencies {
 
     // project specific dependencies
     implementation(project(":core:ui"))
+    implementation(project(":features:auth:domain"))
+    implementation(project(":core:domain"))
 }
 
 

@@ -32,19 +32,10 @@ fun NavGraphBuilder.authNavGraph(
             )
         }
         composable(AuthNavRoutes.Signup.route) {
-            SignupScreen(
-                onSignupClicked = {
-                    fullName, fellowshipName, phoneNo, email, password, userRole ->
-                    // TODO: Implement actual sign-up logic
-                    // For now, directly call onAuthComplete as a placeholder
-                    onAuthComplete()
-                },
-                onNavigateToSignin = {
-                    navController.navigate(AuthNavRoutes.Signin.route) {
-                        popUpTo(AuthNavRoutes.Signin.route) { inclusive = true } // Go back to signin as the start of auth flow
-                    }
-                }
-            )
+            SignupScreen{
+                navController.navigate(AuthNavRoutes.Signin.route)
+                // Optional: popUpTo(AuthNavRoutes.Signup.route) { inclusive = true }
+            }
         }
     }
 }

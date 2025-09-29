@@ -1,5 +1,6 @@
 package com.febin.features.auth.ui.components
 
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.material3.Button
@@ -15,7 +16,8 @@ fun FormButton(
     modifier: Modifier = Modifier,
     text: String,
     onClick: () -> Unit,
-    enabled: Boolean = true
+    enabled: Boolean = true,
+    content: @Composable (RowScope.() -> Unit)
 ) {
     Button(
         onClick = onClick,
@@ -26,7 +28,8 @@ fun FormButton(
         colors = ButtonDefaults.buttonColors(
             containerColor = MaterialTheme.colorScheme.primary,
             contentColor = MaterialTheme.colorScheme.onPrimary
-        )
+        ),
+
     ) {
         Text(text)
     }
