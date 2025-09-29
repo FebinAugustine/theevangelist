@@ -16,6 +16,7 @@ dependencies {
 
     // Project level dependencies
     implementation(project(":core:data"))
+    implementation(project(":core:domain")) // <<< --- ENSURED THIS LINE IS PRESENT
     implementation(project(":features:auth:data"))
     implementation(project(":features:auth:domain"))
     implementation(project(":features:auth:ui"))
@@ -24,5 +25,7 @@ dependencies {
     // Ktor clien
     implementation(libs.ktor.client.core)
 
+    // timber
+    implementation(libs.timber)
+
 }
-    

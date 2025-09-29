@@ -10,7 +10,8 @@ import com.febin.features.auth.ui.screens.SignupScreen
 
 fun NavGraphBuilder.authNavGraph(
     navController: NavController,
-    onAuthComplete: () -> Unit // Callback to navigate after successful auth
+    onAuthComplete: (userId: String) -> Unit, // MODIFIED: Generic callback with userId
+    onNavigateToForgotPassword: () -> Unit   // ADDED: Callback for forgot password
 ) {
     navigation(
         startDestination = AuthNavRoutes.Signin.route,
@@ -18,24 +19,33 @@ fun NavGraphBuilder.authNavGraph(
     ) {
         composable(AuthNavRoutes.Signin.route) {
             SigninScreen(
-                onSigninClicked = {
-                    email, password ->
-                    // TODO: Implement actual sign-in logic
-                    // For now, directly call onAuthComplete as a placeholder
-                    onAuthComplete()
+                // ViewModel is koinInjectable within SigninScreen
+                onNavigateToUserDashboard = { userId -> 
+                    onAuthComplete(userId) // Pass userId up
+                },
+                onNavigateToAdminDashboard = { userId ->
+                    onAuthComplete(userId) // Pass userId up
                 },
                 onNavigateToSignup = {
-                    navController.navigate(AuthNavRoutes.Signup.route) {
-                        // Optional: popUpTo(AuthNavRoutes.Signin.route) { inclusive = true } if you want to clear signin from backstack
+                    navController.navigate(AuthNavRoutes.Signup.route)
+                },
+                onNavigateToForgotPassword = onNavigateToForgotPassword // Pass down forgot password callback
+            )
+        }
+        composable(AuthNavRoutes.Signup.route) {
+            SignupScreen(
+                // ViewModel is koinInjectable within SignupScreen
+                onNavigateToLogin = { 
+                    navController.navigate(AuthNavRoutes.Signin.route) {
+                        // Pop up to Signin, ensuring Signup is removed from backstack,
+                        // and if user is already at Signin (e.g. deep link or re-navigation),
+                        // it effectively re-selects it without adding to stack.
+                        popUpTo(AuthNavRoutes.Signin.route) { inclusive = true }
                     }
                 }
             )
         }
-        composable(AuthNavRoutes.Signup.route) {
-            SignupScreen{
-                navController.navigate(AuthNavRoutes.Signin.route)
-                // Optional: popUpTo(AuthNavRoutes.Signup.route) { inclusive = true }
-            }
-        }
+        // TODO: Add composable for Forgot Password if it's part of this auth graph
+        // composable(AuthNavRoutes.ForgotPassword.route) { /* ForgotPasswordScreen(...) */ }
     }
 }

@@ -1,73 +1,51 @@
 package com.febin.core.data.local
 
-
 import android.content.SharedPreferences
 import androidx.core.content.edit
+import timber.log.Timber // Import Timber
 
 interface AppPreferences {
-    fun saveAuthInfo(accessToken: String, refreshToken: String, userId: String, userType: String?)
-    fun getToken(): String?
-    fun getRefreshToken(): String?
-
-    fun getAccessToken(): String?
+    fun saveUserInfo(userId: String, userType: String?)
     fun getUserId(): String?
     fun getUserType(): String?
-    fun clearAuthInfo()
-    fun saveTokens(accessToken: String, refreshToken: String?)
+    fun clearUserInfo()
 }
 
 class AppPreferencesImpl(private val prefs: SharedPreferences) : AppPreferences {
     companion object {
-        private const val KEY_ACCESS_TOKEN = "access_token"
-        private const val KEY_REFRESH_TOKEN = "refresh_token"
         private const val KEY_USER_ID = "user_id"
         private const val KEY_USER_TYPE = "user_type"
+        private const val TAG = "AppPreferencesImpl"
     }
 
-    override fun saveAuthInfo(accessToken: String, refreshToken: String, userId: String, userType: String?) {
-        val success = prefs.edit()
-            .putString(KEY_ACCESS_TOKEN, accessToken)
-            .putString(KEY_REFRESH_TOKEN, refreshToken)
-            .putString(KEY_USER_ID, userId)
-            .putString(KEY_USER_TYPE, userType)
-            .commit() // Use commit() to get a result
-//        Timber.tag("PREFS_SAVE_RESULT").d("Auth info saved successfully: $success")
-    }
-
-    override fun getToken(): String? {
-        return prefs.getString(KEY_ACCESS_TOKEN, null)
-    }
-
-    override fun getRefreshToken(): String? {
-        return prefs.getString(KEY_REFRESH_TOKEN, null)
-    }
-
-    override fun getAccessToken(): String? {
-        return prefs.getString(KEY_ACCESS_TOKEN, null)
+    override fun saveUserInfo(userId: String, userType: String?) {
+        Timber.tag(TAG).d("Saving user info: prefs instance @${System.identityHashCode(prefs)}, userId='$userId', userType='$userType' for key '$KEY_USER_TYPE'")
+        prefs.edit(commit = true) { 
+            putString(KEY_USER_ID, userId)
+            putString(KEY_USER_TYPE, userType)
+        }
+        // Verify immediately after saving
+        val savedRole = prefs.getString(KEY_USER_TYPE, "NOT_FOUND_IMMEDIATELY_AFTER_SAVE")
+        Timber.tag(TAG).d("Verification read from prefs instance @${System.identityHashCode(prefs)}: userType for key '$KEY_USER_TYPE' is '$savedRole'")
     }
 
     override fun getUserId(): String? {
-        return prefs.getString(KEY_USER_ID, null)
+        val userId = prefs.getString(KEY_USER_ID, null)
+        Timber.tag(TAG).d("Getting userId from prefs instance @${System.identityHashCode(prefs)}: '$userId' for key '$KEY_USER_ID'")
+        return userId
     }
 
     override fun getUserType(): String? {
-        return prefs.getString(KEY_USER_TYPE, null)
+        val userType = prefs.getString(KEY_USER_TYPE, null)
+        Timber.tag(TAG).d("Getting userType from prefs instance @${System.identityHashCode(prefs)}: '$userType' for key '$KEY_USER_TYPE'")
+        return userType
     }
 
-    override fun clearAuthInfo() {
+    override fun clearUserInfo() {
+        Timber.tag(TAG).d("Clearing user info from prefs instance @${System.identityHashCode(prefs)} for keys '$KEY_USER_ID', '$KEY_USER_TYPE'")
         prefs.edit(commit = true) {
-            remove(KEY_ACCESS_TOKEN)
-                .remove(KEY_REFRESH_TOKEN)
-                .remove(KEY_USER_ID)
-                .remove(KEY_USER_TYPE)
-        } // Use commit() for consistency
-//        Timber.tag("PREFS_SAVE_RESULT").d("Auth info cleared successfully: $success")
-    }
-
-    override fun saveTokens(accessToken: String, refreshToken: String?) {
-        prefs.edit(commit = true) {
-            putString(KEY_ACCESS_TOKEN, accessToken)
-                .putString(KEY_REFRESH_TOKEN, refreshToken)
-        } // Use commit() for consistency
+            remove(KEY_USER_ID)
+            remove(KEY_USER_TYPE)
+        }
     }
 }

@@ -13,14 +13,13 @@ val coreDataModule = module {
 
     // 1. Provide SharedPreferences
     single<SharedPreferences> {
-        androidContext().getSharedPreferences("app_prefs_koin", Context.MODE_PRIVATE)
-        // You can change "app_prefs_koin" to your desired SharedPreferences file name
+        // MODIFIED: Standardized SharedPreferences file name
+        androidContext().getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
     }
 
     // 2. Provide AppPreferencesImpl, injecting SharedPreferences
-    // Koin will see that AppPreferencesImpl needs SharedPreferences, and 'get()' will resolve it from above.
     single<AppPreferences> { AppPreferencesImpl(prefs = get()) }
 
-    // 3. Ktor HttpClient: Needs AppPreferences (Koin will inject the AppPreferencesImpl)
-    single<HttpClient> { createHttpClient(appPreferences = get()) }
+    // 3. Ktor HttpClient
+    single<HttpClient> { createHttpClient() }
 }

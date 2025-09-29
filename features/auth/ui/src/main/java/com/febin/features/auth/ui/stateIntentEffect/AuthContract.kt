@@ -9,25 +9,30 @@ interface ViewIntent
 interface ViewEffect
 
 // --- Login ---
-data class LoginState(
+data class SigninState(
     val isLoading: Boolean = false,
     val error: String? = null,
     val email: String = "",
-    val password: String = ""
+    val password: String = "",
+
+    val emailError: String? = null,
+    val passwordError: String? = null,
 ) : ViewState
 
-sealed class LoginIntent : ViewIntent {
-    data class EmailChanged(val email: String) : LoginIntent()
-    data class PasswordChanged(val password: String) : LoginIntent()
-    object LoginClicked : LoginIntent()
+sealed class SigninIntent : ViewIntent {
+    data class EmailChanged(val email: String) : SigninIntent()
+    data class PasswordChanged(val password: String) : SigninIntent()
+    object SigninClicked : SigninIntent()
 //    data class GoogleSignIn(val idToken: String) : LoginIntent()
 }
 
-sealed class LoginEffect : ViewEffect {
-    object NavigateToHome : LoginEffect()
-    object NavigateToForgotPassword : LoginEffect()
-    object NavigateToSignUp : LoginEffect()
-    data class ShowError(val message: String) : LoginEffect()
+sealed class SigninEffect : ViewEffect { // Base class is ViewEffect
+    // MODIFIED: Replaced NavigateToHome with role-based navigation
+    data class NavigateToUserDashboard(val userId: String) : SigninEffect()
+    data class NavigateToAdminDashboard(val userId: String) : SigninEffect()
+    data class ShowError(val message: String) : SigninEffect()
+    object NavigateToForgotPassword : SigninEffect()
+    object NavigateToSignup : SigninEffect()
 }
 
 

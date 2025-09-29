@@ -38,6 +38,7 @@ import com.febin.features.auth.ui.stateIntentEffect.SignupIntent
 import com.febin.features.auth.ui.viewmodel.SignupViewModel
 import kotlinx.coroutines.flow.collectLatest
 import org.koin.androidx.compose.koinViewModel
+import timber.log.Timber
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -61,13 +62,13 @@ fun SignupScreen(
                 is SignupEffect.ShowError -> {
                     // This will now show API errors or general errors from ViewModel
                     // Validation errors are displayed directly below input fields
-                    Log.d("SignupScreen", "Toast error: ${it.message}")
+                    Timber.tag("SignupScreen").d("Toast error: ${it.message}")
                     Toast.makeText(context, it.message, Toast.LENGTH_LONG).show()
                     snackbarHostState.showSnackbar(it.message)
                 }
                 SignupEffect.NavigateToLogin -> {
                     val successMessage = "Registration Successful"
-                    Log.d("SignupScreen", "Toast success: $successMessage")
+                    Timber.tag("SignupScreen").d("Toast success: $successMessage")
                     Toast.makeText(context, successMessage, Toast.LENGTH_LONG).show()
                     onNavigateToLogin()
                 }

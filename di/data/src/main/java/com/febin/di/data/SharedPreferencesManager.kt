@@ -3,6 +3,7 @@ package com.febin.di.data  // Declares the package for this file (organizes code
 import android.content.Context  // Imports Android's Context class (provides app context for prefs).
 import android.content.SharedPreferences  // Imports SharedPreferences interface (handles key-value storage).
 import androidx.core.content.edit // Imports extension function for SharedPreferences.edit().
+import timber.log.Timber // Import Timber
 
 /**
  * Simple manager for SharedPreferences (e.g., for onboarding status, user role).
@@ -18,73 +19,65 @@ class SharedPreferencesManager(private val context: Context) {  // Defines the c
         // Private constant: Name of the SharedPreferences file.
         private const val KEY_ONBOARDING_COMPLETED = "onboarding_completed"
         // Private constant: Key for onboarding flag.
-        private const val KEY_CURRENT_ROLE = "user_role"
+        private const val KEY_CURRENT_ROLE = "user_type" // Aligned key
     // Private constant: Key for user role (e.g., "USER").
-
-        // Add more keys as needed (e.g., theme_mode = "dark")  // Comment: Placeholder for future keys.
+        private const val TAG = "SharedPreferencesMgr"
 
     }  // Ends companion object.
 
     private val prefs: SharedPreferences = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
     // Private val: Gets the SharedPreferences instance using context and file name (private mode).
 
-    fun isOnboardingCompleted(): Boolean = prefs.getBoolean(KEY_ONBOARDING_COMPLETED, false)
-    // Public function: Retrieves boolean value for onboarding key (default false).
+    init {
+        Timber.tag(TAG).d("Initialized with prefs instance @${System.identityHashCode(prefs)} for file '$PREF_NAME'")
+    }
 
-    fun setOnboardingCompleted(completed: Boolean) {  // Public function: Sets boolean value for onboarding key.
+    fun isOnboardingCompleted(): Boolean {
+        val completed = prefs.getBoolean(KEY_ONBOARDING_COMPLETED, false)
+        Timber.tag(TAG).d("Reading isOnboardingCompleted from prefs instance @${System.identityHashCode(prefs)}: '$completed' for key '$KEY_ONBOARDING_COMPLETED'")
+        return completed
+    }
 
+    fun setOnboardingCompleted(completed: Boolean) {  
+        Timber.tag(TAG).d("Setting isOnboardingCompleted to '$completed' in prefs instance @${System.identityHashCode(prefs)} for key '$KEY_ONBOARDING_COMPLETED'")
         prefs.edit { putBoolean(KEY_ONBOARDING_COMPLETED, completed) }
-    // Gets editor, puts boolean, applies asynchronously.
+    }  
 
-    }  // Ends setOnboardingCompleted.
+    fun getCurrentRole(): String? {
+        val role = prefs.getString(KEY_CURRENT_ROLE, null)
+        Timber.tag(TAG).d("Reading getCurrentRole from prefs instance @${System.identityHashCode(prefs)}: '$role' for key '$KEY_CURRENT_ROLE'")
+        return role
+    }
 
-    fun getCurrentRole(): String? = prefs.getString(KEY_CURRENT_ROLE, null)
-    // Public function: Retrieves string value for role key (default null).
-
-    fun setCurrentRole(role: String?) {  // Public function: Sets string value for role key.
-
+    fun setCurrentRole(role: String?) {  
+        Timber.tag(TAG).d("Setting getCurrentRole to '$role' in prefs instance @${System.identityHashCode(prefs)} for key '$KEY_CURRENT_ROLE'")
         prefs.edit { putString(KEY_CURRENT_ROLE, role) }
-    // Gets editor, puts string, applies asynchronously.
+    }  
 
-    }  // Ends setCurrentRole.
-
-    // Generic helpers (extend as needed)  // Comment: Section for reusable helpers.
-
-    // Generic getter with reified type (inline for compile-time checks)
     private inline fun <reified T> getPref(key: String, default: T): T {
-        return when (T::class) {  // Reified: Access T at compile-time
+        return when (T::class) {  
             String::class -> prefs.getString(key, default as String) as T
             Boolean::class -> prefs.getBoolean(key, default as Boolean) as T
             Int::class -> prefs.getInt(key, default as Int) as T
-            Long::class -> prefs.getLong(key, default as Long) as T  // Now safe—no unchecked cast
+            Long::class -> prefs.getLong(key, default as Long) as T  
             else -> default
         }
-    }  // Ends getPref.
+    }  
 
-    fun putPref(key: String, value: Any) {  // Public function: Generic setter for any value type.
+    fun putPref(key: String, value: Any) {  
+        prefs.edit {  
+            when (value) {  
+                is String -> putString(key, value)  
+                is Boolean -> putBoolean(key, value)  
+                is Int -> putInt(key, value)  
+                is Long -> putLong(key, value)  
+            }  
+        }  
+    }  
 
-        prefs.edit {  // Gets editor and starts apply block.
-
-            when (value) {  // When expression: Matches on value type to call correct put method.
-
-                is String -> putString(key, value)  // If String, putString.
-
-                is Boolean -> putBoolean(key, value)  // If Boolean, putBoolean.
-
-                is Int -> putInt(key, value)  // If Int, putInt.
-
-                is Long -> putLong(key, value)  // If Long, putLong.
-
-            }  // Ends when.
-
-        }  // Applies changes asynchronously.
-
-    }  // Ends putPref.
-
-    fun clearAll() {  // Public function: Clears all prefs.
-
-        prefs.edit { clear() }  // Gets editor, clears all, applies.
-
-    }  // Ends clearAll.
+    fun clearAll() {  
+        Timber.tag(TAG).d("Clearing all prefs from instance @${System.identityHashCode(prefs)}")
+        prefs.edit { clear() }  
+    }  
 
 }  // Ends class.

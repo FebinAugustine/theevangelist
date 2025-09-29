@@ -5,8 +5,8 @@ import android.util.Patterns
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.febin.features.auth.domain.useCases.SignupUseCase
-import com.febin.features.auth.domain.utils.DomainFailureException // ADDED
-import com.febin.features.auth.domain.utils.Failure
+import com.febin.core.domain.utils.DomainFailureException // Corrected import
+import com.febin.core.domain.utils.Failure // Corrected import
 import com.febin.features.auth.ui.stateIntentEffect.SignupEffect
 import com.febin.features.auth.ui.stateIntentEffect.SignupIntent
 import com.febin.features.auth.ui.stateIntentEffect.SignupState
@@ -172,12 +172,12 @@ class SignupViewModel(private val signupUseCase: SignupUseCase) : ViewModel() {
                 _state.value = _state.value.copy(isLoading = false)
                 _effect.send(SignupEffect.NavigateToLogin)
             }
-            .onFailure { throwable -> // throwable is now expected to be DomainFailureException
+            .onFailure { throwable -> 
                 val actualFailure = (throwable as? DomainFailureException)?.domainFailure
 
                 val userFriendlyMessage = if (actualFailure != null) {
                     when (actualFailure) {
-                        is Failure.NetworkError -> actualFailure.message // Already user-friendly
+                        is Failure.NetworkError -> actualFailure.message 
                         is Failure.HttpError -> {
                             val parsedError = actualFailure.errorBody?.let {
                                 try {
@@ -193,9 +193,10 @@ class SignupViewModel(private val signupUseCase: SignupUseCase) : ViewModel() {
                                 403 -> "Access forbidden. You do not have permission."
                                 409 -> {
                                     val specificConflictMessage = parsedError?.message ?: parsedError?.error
-                                    if (specificConflictMessage?.contains("Email already exists", ignoreCase = true) == true) {
+                                    if (specificConflictMessage?.contains("Email already exists", ignoreCase = true) == true || 
+                                        specificConflictMessage?.contains("Email already taken", ignoreCase = true) == true) { // More robust email check
                                         "This email address is already registered."
-                                    } else if (specificConflictMessage?.contains("Phone number already registered", ignoreCase = true) == true) {
+                                    } else if (specificConflictMessage?.contains("Phone number already taken", ignoreCase = true) == true) { // MODIFIED to match backend
                                         "This phone number is already registered."
                                     } else {
                                         specificConflictMessage ?: "Conflict: The data you entered already exists or conflicts with existing records."
@@ -203,13 +204,14 @@ class SignupViewModel(private val signupUseCase: SignupUseCase) : ViewModel() {
                                 }
                                 in 400..499 -> "Request error: ${parsedError?.message ?: actualFailure.message} (Code: ${actualFailure.code})"
                                 in 500..599 -> "Server error (Code: ${actualFailure.code}). Please try again later."
-                                else -> actualFailure.message // Default HTTP error message from Failure class
+                                else -> actualFailure.message 
                             }
                         }
-                        is Failure.GenericError -> actualFailure.message // Already user-friendly
+                        is Failure.GenericError -> actualFailure.message 
+                        is Failure.AuthError -> "Authentication error. Please try signing in again."
                     }
                 } else {
-                    Timber.e(throwable, "Unexpected error type in onFailure: ${throwable.javaClass.name}")
+                    Timber.e(throwable, "SignupViewModel: Error in onFailure, but actualFailure is null or not DomainFailureException. Exception: ${throwable.message}")
                     "An unexpected error occurred. Please try again."
                 }
 

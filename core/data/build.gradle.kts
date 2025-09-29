@@ -26,4 +26,9 @@ dependencies {
 
     // Timber
     implementation(libs.timber)
+
+    // project level dependencies
+    implementation(project(":core:domain"))
+
+
 }

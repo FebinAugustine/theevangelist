@@ -1,7 +1,7 @@
 package com.febin.core.data.network
 
 import com.febin.core.data.constants.Constants
-import com.febin.core.data.local.AppPreferences
+// AppPreferences import removed as it's no longer a parameter
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.android.Android
 // import io.ktor.client.plugins.ClientRequestException // No longer explicitly needed here
@@ -26,12 +26,12 @@ import kotlin.math.pow
 
 
 /**
- * Creates a fully configured Ktor HttpClient for Android.
+ * Creates a Ktor HttpClient for Android, relying on HttpOnly cookies for auth.
  * - Uses Android engine for native cookie handling.
- * - Bearer auth with token load/refresh from AppPreferences (via AuthInterceptor).
  * - JSON serialization, Timber logging, error validation.
  */
-fun createHttpClient(appPreferences: AppPreferences) = HttpClient(Android) {
+// AppPreferences parameter removed
+fun createHttpClient() = HttpClient(Android) {
     expectSuccess = true // This will throw HttpResponseException for non-2xx responses
 
     install(ContentNegotiation) {
@@ -73,11 +73,9 @@ fun createHttpClient(appPreferences: AppPreferences) = HttpClient(Android) {
         }
     }
 
-    // Install Authentication via the extension function
-    installAuth(appPreferences)
-
-    // The custom HttpCallValidator block has been removed.
-    // expectSuccess = true handles throwing exceptions for non-2xx responses.
+    // The Auth plugin configured for Bearer tokens is removed.
+    // Cookie management for HttpOnly cookies will be handled by the Ktor Android engine.
+    // installAuth(appPreferences) 
 
     defaultRequest {
         url(Constants.BASE_URL)
@@ -85,5 +83,3 @@ fun createHttpClient(appPreferences: AppPreferences) = HttpClient(Android) {
         header(HttpHeaders.UserAgent, "TheEvangelistApp/1.0")
     }
 }
-
-// RefreshResponseDto and auth helper functions have been moved to AuthInterceptor.kt

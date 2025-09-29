@@ -12,4 +12,11 @@ interface AuthRepository {
         role: String
     ): Result<User>
 
+    // Signin
+
+    suspend fun signin(
+        email: String,
+        password: String
+    ): Result<User>
+
 }

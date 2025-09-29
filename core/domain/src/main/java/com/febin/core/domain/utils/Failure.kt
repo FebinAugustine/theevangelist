@@ -1,4 +1,4 @@
-package com.febin.features.auth.domain.utils
+package com.febin.core.domain.utils // MODIFIED PACKAGE
 
 // Sealed class for representing different types of failures.
 sealed class Failure {
