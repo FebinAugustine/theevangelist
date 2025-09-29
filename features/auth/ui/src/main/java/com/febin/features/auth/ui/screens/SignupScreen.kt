@@ -59,6 +59,8 @@ fun SignupScreen(
         viewModel.effect.collectLatest {
             when (it) {
                 is SignupEffect.ShowError -> {
+                    // This will now show API errors or general errors from ViewModel
+                    // Validation errors are displayed directly below input fields
                     Log.d("SignupScreen", "Toast error: ${it.message}")
                     Toast.makeText(context, it.message, Toast.LENGTH_LONG).show()
                     snackbarHostState.showSnackbar(it.message)
@@ -121,18 +123,20 @@ fun SignupScreen(
                         onValueChange = { viewModel.onIntent(SignupIntent.FullnameChanged(it)) },
                         label = "Full Name",
                         placeholder = "Enter your full name",
-                        leadingIcon = Icons.Filled.Person, // Changed
+                        leadingIcon = Icons.Filled.Person,
                         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth(),
+                        errorMessage = state.fullnameError // ADDED
                     )
                     FormInput(
                         value = state.email,
                         onValueChange = { viewModel.onIntent(SignupIntent.EmailChanged(it)) },
                         label = "Email",
                         placeholder = "Enter your email",
-                        leadingIcon = Icons.Filled.Email, // Changed
+                        leadingIcon = Icons.Filled.Email,
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email, imeAction = ImeAction.Next),
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth(),
+                        errorMessage = state.emailError // ADDED
                     )
 
                     FormInput(
@@ -140,10 +144,11 @@ fun SignupScreen(
                         onValueChange = { viewModel.onIntent(SignupIntent.PasswordChanged(it)) },
                         label = "Password",
                         placeholder = "Create a password",
-                        leadingIcon = Icons.Filled.Lock, // Changed
+                        leadingIcon = Icons.Filled.Lock,
                         isPasswordToggleEnabled = true,
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Next),
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth(),
+                        errorMessage = state.passwordError // ADDED
                     )
 
                     FormInput(
@@ -151,9 +156,10 @@ fun SignupScreen(
                         onValueChange = { viewModel.onIntent(SignupIntent.PhoneChanged(it)) },
                         label = "Phone Number",
                         placeholder = "Enter your phone number",
-                        leadingIcon = Icons.Filled.Phone, // Changed
+                        leadingIcon = Icons.Filled.Phone,
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone, imeAction = ImeAction.Next),
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth(),
+                        errorMessage = state.phoneError // ADDED
                     )
 
 
@@ -167,11 +173,12 @@ fun SignupScreen(
                             onValueChange = { viewModel.onIntent(SignupIntent.FellowshipChanged(it)) },
                             label = "Fellowship Name",
                             placeholder = "Select or type fellowship",
-                            leadingIcon = Icons.Filled.Group, // Changed
+                            leadingIcon = Icons.Filled.Group,
                             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = fellowshipExpanded) },
-                            readOnly = false, // Set to true if only selection is allowed
+                            readOnly = false, 
                             modifier = Modifier.menuAnchor().fillMaxWidth(),
-                            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
+                            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+                            errorMessage = state.fellowshipError // ADDED
                         )
                         ExposedDropdownMenu(
                             expanded = fellowshipExpanded,
@@ -199,11 +206,12 @@ fun SignupScreen(
                             onValueChange = { viewModel.onIntent(SignupIntent.RoleChanged(it)) },
                             label = "User Role",
                             placeholder = "Select your role",
-                            leadingIcon = Icons.Filled.AccountCircle, // Changed
+                            leadingIcon = Icons.Filled.AccountCircle,
                             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = roleExpanded) },
-                            readOnly = true, // Important for dropdown behavior with FormInput
+                            readOnly = true, 
                             modifier = Modifier.menuAnchor().fillMaxWidth(),
-                            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done)
+                            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                            errorMessage = state.roleError // ADDED
                         )
                         ExposedDropdownMenu(
                             expanded = roleExpanded,

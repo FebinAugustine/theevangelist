@@ -34,13 +34,20 @@ sealed class LoginEffect : ViewEffect {
 // --- Signup ---
 data class SignupState(
     val isLoading: Boolean = false,
-    val error: String? = null,
+    val error: String? = null, // General API error
     val fullname: String = "",
     val email: String = "",
     val password: String = "",
     val phone: String = "",
     val fellowship: String = "",
-    val role: String = ""
+    val role: String = "",
+    // New fields for validation errors
+    val fullnameError: String? = null,
+    val emailError: String? = null,
+    val passwordError: String? = null,
+    val phoneError: String? = null,
+    val fellowshipError: String? = null,
+    val roleError: String? = null
 
 ) : ViewState
 
