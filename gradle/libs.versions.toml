@@ -71,6 +71,7 @@ ktor-client-timeout = { group = "io.ktor", name = "ktor-client-timeout", version
 ktor-client-retry = { group = "io.ktor", name = "ktor-client-retry", version.ref = "ktor" }
 
 
+
 # Forlogging
 timber = { group = "com.jakewharton.timber", name = "timber", version = "5.0.1" }
 # For using Coroutines in Kotlin

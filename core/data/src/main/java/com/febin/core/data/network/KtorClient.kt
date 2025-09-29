@@ -4,8 +4,8 @@ import com.febin.core.data.constants.Constants
 import com.febin.core.data.local.AppPreferences
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.android.Android
-import io.ktor.client.plugins.ClientRequestException
-import io.ktor.client.plugins.HttpCallValidator
+// import io.ktor.client.plugins.ClientRequestException // No longer explicitly needed here
+// import io.ktor.client.plugins.HttpCallValidator // REMOVING
 import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.HttpRequestRetry
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
@@ -14,7 +14,7 @@ import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logger
 import io.ktor.client.plugins.logging.Logging
 import io.ktor.client.request.header
-import io.ktor.client.statement.bodyAsText
+// import io.ktor.client.statement.bodyAsText // Not directly used here anymore
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.serialization.kotlinx.json.json
@@ -32,7 +32,7 @@ import kotlin.math.pow
  * - JSON serialization, Timber logging, error validation.
  */
 fun createHttpClient(appPreferences: AppPreferences) = HttpClient(Android) {
-    expectSuccess = true
+    expectSuccess = true // This will throw HttpResponseException for non-2xx responses
 
     install(ContentNegotiation) {
         json(Json {
@@ -76,15 +76,8 @@ fun createHttpClient(appPreferences: AppPreferences) = HttpClient(Android) {
     // Install Authentication via the extension function
     installAuth(appPreferences)
 
-    install(HttpCallValidator) {
-        handleResponseExceptionWithRequest { cause, _ ->
-            if (cause is ClientRequestException) {
-                val errorBody = cause.response.bodyAsText()
-                Timber.e("API Error: $errorBody")
-                throw Exception(errorBody)
-            }
-        }
-    }
+    // The custom HttpCallValidator block has been removed.
+    // expectSuccess = true handles throwing exceptions for non-2xx responses.
 
     defaultRequest {
         url(Constants.BASE_URL)
@@ -94,4 +87,3 @@ fun createHttpClient(appPreferences: AppPreferences) = HttpClient(Android) {
 }
 
 // RefreshResponseDto and auth helper functions have been moved to AuthInterceptor.kt
-

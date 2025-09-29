@@ -1,18 +1,38 @@
 package com.febin.features.auth.domain.utils
 
-import java.io.IOException
+// Sealed class for representing different types of failures.
+sealed class Failure {
+    // Abstract property for a user-friendly message associated with the failure.
+    abstract val message: String
 
-sealed class Failure(message: String) : IOException(message) {
-    class NetworkFailure(message: String = "No internet connection. Please try again.") : Failure(message)
-    class ServerFailure(message: String = "Our servers are having a problem. Please try again later.") : Failure(message)
-    class UnknownFailure(message: String = "An unknown error occurred. Please try again.") : Failure(message)
+    /**
+     * Represents a network-related failure (e.g., no internet connection, DNS issues).
+     * @param message A user-friendly message describing the network error.
+     */
+    data class NetworkError(override val message: String) : Failure()
 
-    companion object {
-        fun fromException(e: Exception): Failure {
-            return when (e) {
-                is IOException -> NetworkFailure()
-                else -> UnknownFailure(e.message ?: "An unknown error occurred")
-            }
-        }
-    }
+    /**
+     * Represents an error originating from an HTTP response (e.g., 4xx or 5xx status codes).
+     * @param code The HTTP status code.
+     * @param errorBody The raw error body string received from the server, if any.
+     * @param message A generic user-friendly message for this type of HTTP error.
+     *                More specific messages can be derived in the ViewModel based on the code and errorBody.
+     */
+    data class HttpError(
+        val code: Int,
+        val errorBody: String?,
+        override val message: String
+    ) : Failure()
+
+    /**
+     * Represents a generic or unexpected failure that doesn't fit into other categories.
+     * @param message A user-friendly message describing the generic error.
+     */
+    data class GenericError(override val message: String) : Failure()
 }
+
+/**
+ * A custom Exception class to wrap domain-specific Failure objects,
+ * allowing them to be used with Kotlin's standard Result.failure().
+ */
+class DomainFailureException(val domainFailure: Failure) : Exception(domainFailure.message)

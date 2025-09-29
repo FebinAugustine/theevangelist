@@ -1,10 +1,11 @@
 package com.febin.features.auth.ui.viewmodel
 
 import android.util.Log
-import android.util.Patterns // ADDED: For email validation
+import android.util.Patterns
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.febin.features.auth.domain.useCases.SignupUseCase
+import com.febin.features.auth.domain.utils.DomainFailureException // ADDED
 import com.febin.features.auth.domain.utils.Failure
 import com.febin.features.auth.ui.stateIntentEffect.SignupEffect
 import com.febin.features.auth.ui.stateIntentEffect.SignupIntent
@@ -14,6 +15,17 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
+import timber.log.Timber
+
+// Helper data class for parsing API error responses
+@Serializable
+data class ApiErrorResponse(
+    val message: String? = null,
+    val error: String? = null, // For simpler error messages from some APIs
+    val errors: Map<String, String>? = null // For detailed field errors (e.g., Spring Boot validation)
+)
 
 class SignupViewModel(private val signupUseCase: SignupUseCase) : ViewModel() {
 
@@ -23,12 +35,13 @@ class SignupViewModel(private val signupUseCase: SignupUseCase) : ViewModel() {
     private val _effect = Channel<SignupEffect>()
     val effect = _effect.receiveAsFlow()
 
+    private val json = Json { ignoreUnknownKeys = true } // JSON parser instance
+
     // --- Validation Helper Functions ---
     private fun validateFullname(fullname: String): String? {
         if (fullname.isBlank()) return "Full name is required."
         if (fullname.length < 2) return "Full name must be at least 2 characters."
         if (fullname.length > 50) return "Full name cannot exceed 50 characters."
-        // Add more specific character validation if needed (e.g., regex for allowed chars)
         return null
     }
 
@@ -67,37 +80,37 @@ class SignupViewModel(private val signupUseCase: SignupUseCase) : ViewModel() {
                 is SignupIntent.FullnameChanged -> {
                     _state.value = _state.value.copy(
                         fullname = intent.fullname,
-                        fullnameError = null // Clear error on change
+                        fullnameError = null
                     )
                 }
                 is SignupIntent.EmailChanged -> {
                     _state.value = _state.value.copy(
                         email = intent.email,
-                        emailError = null // Clear error on change
+                        emailError = null
                     )
                 }
                 is SignupIntent.PhoneChanged -> {
                     _state.value = _state.value.copy(
                         phone = intent.phone,
-                        phoneError = null // Clear error on change
+                        phoneError = null
                     )
                 }
                 is SignupIntent.PasswordChanged -> {
                     _state.value = _state.value.copy(
                         password = intent.password,
-                        passwordError = null // Clear error on change
+                        passwordError = null
                     )
                 }
                 is SignupIntent.FellowshipChanged -> {
                     _state.value = _state.value.copy(
                         fellowship = intent.fellowship,
-                        fellowshipError = null // Clear error on change
+                        fellowshipError = null
                     )
                 }
                 is SignupIntent.RoleChanged -> {
                     _state.value = _state.value.copy(
                         role = intent.role,
-                        roleError = null // Clear error on change
+                        roleError = null
                     )
                 }
                 SignupIntent.SignupClicked -> {
@@ -123,7 +136,7 @@ class SignupViewModel(private val signupUseCase: SignupUseCase) : ViewModel() {
             phoneError = phoneError,
             fellowshipError = fellowshipError,
             roleError = roleError,
-            isLoading = false // Ensure loading is off if validation fails early
+            isLoading = false
         )
 
         val allValidationsPassed = fullnameError == null && emailError == null &&
@@ -131,20 +144,21 @@ class SignupViewModel(private val signupUseCase: SignupUseCase) : ViewModel() {
                 fellowshipError == null && roleError == null
 
         if (allValidationsPassed) {
-            viewModelScope.launch { // Launch coroutine for suspend function call
+            viewModelScope.launch {
                 performSignupApiCall()
             }
         }
     }
 
-    private suspend fun performSignupApiCall() { // RENAMED from signup()
-        _state.value = _state.value.copy(isLoading = true, error = null) // Clear previous API error
+    private suspend fun performSignupApiCall() {
+        _state.value = _state.value.copy(isLoading = true, error = null)
         val fullname = _state.value.fullname
         val email = _state.value.email
         val password = _state.value.password
         val phone = _state.value.phone
 
-        Log.d("SignupViewModel", "Validation passed. Register request: fullname=$fullname, email=$email, phone=$phone")
+        Timber.tag("SignupViewModel")
+            .d("Validation passed. Register request: fullname=$fullname, email=$email, phone=$phone")
         signupUseCase(
             fullname = fullname,
             email = email,
@@ -154,15 +168,55 @@ class SignupViewModel(private val signupUseCase: SignupUseCase) : ViewModel() {
             role = _state.value.role
         )
             .onSuccess {
-                Log.d("SignupViewModel", "Register success")
+                Timber.tag("SignupViewModel").d("Register success")
                 _state.value = _state.value.copy(isLoading = false)
                 _effect.send(SignupEffect.NavigateToLogin)
             }
-            .onFailure { throwable ->
-                val errorMessage = (throwable as? Failure)?.message ?: throwable.message ?: "An unknown error occurred"
-                Log.d("SignupViewModel", "Register failure: $errorMessage")
-                _state.value = _state.value.copy(isLoading = false, error = errorMessage)
-                _effect.send(SignupEffect.ShowError(errorMessage))
+            .onFailure { throwable -> // throwable is now expected to be DomainFailureException
+                val actualFailure = (throwable as? DomainFailureException)?.domainFailure
+
+                val userFriendlyMessage = if (actualFailure != null) {
+                    when (actualFailure) {
+                        is Failure.NetworkError -> actualFailure.message // Already user-friendly
+                        is Failure.HttpError -> {
+                            val parsedError = actualFailure.errorBody?.let {
+                                try {
+                                    json.decodeFromString<ApiErrorResponse>(it)
+                                } catch (e: Exception) {
+                                    Timber.e(e, "Failed to parse API error body: ${actualFailure.errorBody}")
+                                    null
+                                }
+                            }
+                            when (actualFailure.code) {
+                                400 -> parsedError?.message ?: "Invalid data sent. Please check your input."
+                                401 -> "Unauthorized. Please try logging in again."
+                                403 -> "Access forbidden. You do not have permission."
+                                409 -> {
+                                    val specificConflictMessage = parsedError?.message ?: parsedError?.error
+                                    if (specificConflictMessage?.contains("Email already exists", ignoreCase = true) == true) {
+                                        "This email address is already registered."
+                                    } else if (specificConflictMessage?.contains("Phone number already registered", ignoreCase = true) == true) {
+                                        "This phone number is already registered."
+                                    } else {
+                                        specificConflictMessage ?: "Conflict: The data you entered already exists or conflicts with existing records."
+                                    }
+                                }
+                                in 400..499 -> "Request error: ${parsedError?.message ?: actualFailure.message} (Code: ${actualFailure.code})"
+                                in 500..599 -> "Server error (Code: ${actualFailure.code}). Please try again later."
+                                else -> actualFailure.message // Default HTTP error message from Failure class
+                            }
+                        }
+                        is Failure.GenericError -> actualFailure.message // Already user-friendly
+                    }
+                } else {
+                    Timber.e(throwable, "Unexpected error type in onFailure: ${throwable.javaClass.name}")
+                    "An unexpected error occurred. Please try again."
+                }
+
+                Timber.tag("SignupViewModel")
+                    .d("Register failure: $userFriendlyMessage. Original DomainFailure: $actualFailure, Wrapped Exception: $throwable")
+                _state.value = _state.value.copy(isLoading = false, error = userFriendlyMessage)
+                _effect.send(SignupEffect.ShowError(userFriendlyMessage))
             }
     }
 }
