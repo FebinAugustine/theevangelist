@@ -76,6 +76,8 @@ ktor-client-retry = { group = "io.ktor", name = "ktor-client-retry", version.ref
 timber = { group = "com.jakewharton.timber", name = "timber", version = "5.0.1" }
 # For using Coroutines in Kotlin
 kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "coroutines" }
+kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "coroutines" }
+
 androidx-compose-runtime = { group = "androidx.compose.runtime", name = "runtime", version.ref = "runtime" }
 # Swiper
 compose-foundation = { module = "androidx.compose.foundation:foundation", version.ref = "compose" }

@@ -1,4 +1,4 @@
-package com.febin.di.data  // Declares the package for this file (organizes code in di module).
+package com.febin.di.data
 
 import android.content.Context  // Imports Android's Context class (provides app context for prefs).
 import android.content.SharedPreferences  // Imports SharedPreferences interface (handles key-value storage).

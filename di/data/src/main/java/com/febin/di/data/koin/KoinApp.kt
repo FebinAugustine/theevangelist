@@ -1,7 +1,6 @@
 package com.febin.di.data.koin
 
 import android.content.Context
-import com.febin.core.data.di.coreDataModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
 import org.koin.dsl.KoinAppDeclaration

@@ -1,4 +1,4 @@
-package com.febin.core.data.di // Or your chosen DI package in core/data
+package com.febin.di.data.koin
 
 import android.content.Context
 import android.content.SharedPreferences
@@ -21,5 +21,6 @@ val coreDataModule = module {
     single<AppPreferences> { AppPreferencesImpl(prefs = get()) }
 
     // 3. Ktor HttpClient
-    single<HttpClient> { createHttpClient() }
+    single<HttpClient> { createHttpClient(get()) }
+
 }

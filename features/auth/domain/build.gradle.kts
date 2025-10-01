@@ -7,7 +7,10 @@ plugins {
 dependencies {
     // project level dependencies
     implementation(project(":core:domain"))
-    // implementation(project(":features:auth:domain")) // REMOVED SELF-DEPENDENCY
+
+    // coroutines
+    implementation(libs.kotlinx.coroutines.android)
+    implementation(libs.kotlinx.coroutines.core)
 
 
 }

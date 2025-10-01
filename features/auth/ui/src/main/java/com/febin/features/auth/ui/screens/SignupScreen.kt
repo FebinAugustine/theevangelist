@@ -120,18 +120,18 @@ fun SignupScreen(
                     Spacer(modifier = Modifier.height(12.dp))
 
                     FormInput(
-                        value = state.fullname,
-                        onValueChange = { viewModel.onIntent(SignupIntent.FullnameChanged(it)) },
+                        value = state.fullName,
+                        onValueChange = { viewModel.sendIntent(SignupIntent.FullNameChanged(it)) },
                         label = "Full Name",
                         placeholder = "Enter your full name",
                         leadingIcon = Icons.Filled.Person,
                         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
                         modifier = Modifier.fillMaxWidth(),
-                        errorMessage = state.fullnameError // ADDED
+                        errorMessage = state.fullNameError // ADDED
                     )
                     FormInput(
                         value = state.email,
-                        onValueChange = { viewModel.onIntent(SignupIntent.EmailChanged(it)) },
+                        onValueChange = { viewModel.sendIntent(SignupIntent.EmailChanged(it)) },
                         label = "Email",
                         placeholder = "Enter your email",
                         leadingIcon = Icons.Filled.Email,
@@ -142,7 +142,7 @@ fun SignupScreen(
 
                     FormInput(
                         value = state.password,
-                        onValueChange = { viewModel.onIntent(SignupIntent.PasswordChanged(it)) },
+                        onValueChange = { viewModel.sendIntent(SignupIntent.PasswordChanged(it)) },
                         label = "Password",
                         placeholder = "Create a password",
                         leadingIcon = Icons.Filled.Lock,
@@ -154,7 +154,7 @@ fun SignupScreen(
 
                     FormInput(
                         value = state.phone,
-                        onValueChange = { viewModel.onIntent(SignupIntent.PhoneChanged(it)) },
+                        onValueChange = { viewModel.sendIntent(SignupIntent.PhoneChanged(it)) },
                         label = "Phone Number",
                         placeholder = "Enter your phone number",
                         leadingIcon = Icons.Filled.Phone,
@@ -171,7 +171,7 @@ fun SignupScreen(
                     ) {
                         FormInput(
                             value = state.fellowship,
-                            onValueChange = { viewModel.onIntent(SignupIntent.FellowshipChanged(it)) },
+                            onValueChange = { viewModel.sendIntent(SignupIntent.FellowshipChanged(it)) },
                             label = "Fellowship Name",
                             placeholder = "Select or type fellowship",
                             leadingIcon = Icons.Filled.Group,
@@ -190,7 +190,7 @@ fun SignupScreen(
                                 DropdownMenuItem(
                                     text = { Text(selectionOption) },
                                     onClick = {
-                                        viewModel.onIntent(SignupIntent.FellowshipChanged(selectionOption))
+                                        viewModel.sendIntent(SignupIntent.FellowshipChanged(selectionOption))
                                         fellowshipExpanded = false
                                     }
                                 )
@@ -204,7 +204,7 @@ fun SignupScreen(
                     ) {
                         FormInput(
                             value = state.role,
-                            onValueChange = { viewModel.onIntent(SignupIntent.RoleChanged(it)) },
+                            onValueChange = { viewModel.sendIntent(SignupIntent.RoleChanged(it)) },
                             label = "User Role",
                             placeholder = "Select your role",
                             leadingIcon = Icons.Filled.AccountCircle,
@@ -223,7 +223,7 @@ fun SignupScreen(
                                 DropdownMenuItem(
                                     text = { Text(selectionOption) },
                                     onClick = {
-                                        viewModel.onIntent(SignupIntent.RoleChanged(selectionOption))
+                                        viewModel.sendIntent(SignupIntent.RoleChanged(selectionOption))
                                         roleExpanded = false
                                     }
                                 )
@@ -235,7 +235,7 @@ fun SignupScreen(
 
                     FormButton(
                         text = "Sign Up",
-                        onClick = { viewModel.onIntent(SignupIntent.SignupClicked) },
+                        onClick = { viewModel.sendIntent(SignupIntent.SignupClicked) },
                         enabled = !state.isLoading,
                         modifier = Modifier.fillMaxWidth().height(50.dp),
                     ) {

@@ -20,9 +20,9 @@ dependencies {
     implementation(libs.ktor.client.logging)
     implementation(libs.ktor.client.android)
     implementation(libs.ktor.client.auth)
-    // implementation(libs.ktor.client.timeout) // REMOVED
-    // implementation(libs.ktor.client.retry)   // REMOVED
-    implementation(libs.ktor.client.cio)
+//     implementation(libs.ktor.client.timeout)
+//     implementation(libs.ktor.client.retry)
+     implementation(libs.ktor.client.cio)
 
     // Timber
     implementation(libs.timber)

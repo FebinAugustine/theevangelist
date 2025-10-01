@@ -1,7 +1,9 @@
 package com.febin.features.auth.ui.stateIntentEffect
 
-interface ViewState
+import com.febin.core.domain.model.User
 
+
+interface ViewState
 // A generic interface for MVI intents
 interface ViewIntent
 
@@ -40,29 +42,35 @@ sealed class SigninEffect : ViewEffect { // Base class is ViewEffect
 data class SignupState(
     val isLoading: Boolean = false,
     val error: String? = null, // General API error
-    val fullname: String = "",
+    val fullName: String = "",
     val email: String = "",
     val password: String = "",
     val phone: String = "",
     val fellowship: String = "",
     val role: String = "",
+
+
     // New fields for validation errors
-    val fullnameError: String? = null,
+    val fullNameError: String? = null,
     val emailError: String? = null,
     val passwordError: String? = null,
     val phoneError: String? = null,
     val fellowshipError: String? = null,
-    val roleError: String? = null
+    val roleError: String? = null,
 
-) : ViewState
+    val user: User? = null,
+
+
+    ) : ViewState
 
 sealed class SignupIntent : ViewIntent {
-    data class FullnameChanged(val fullname: String) : SignupIntent()
+    data class FullNameChanged(val fullName: String) : SignupIntent()
     data class EmailChanged(val email: String) : SignupIntent()
     data class PhoneChanged(val phone: String) : SignupIntent()
     data class PasswordChanged(val password: String) : SignupIntent()
     data class FellowshipChanged(val fellowship: String) : SignupIntent()
     data class RoleChanged(val role: String) : SignupIntent()
+    data object ClearError : SignupIntent()
     object SignupClicked : SignupIntent()
 }
 

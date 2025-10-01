@@ -22,33 +22,26 @@ import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.module
 
 val authModule = module {
-
-    // Core Data Dependencies
+    // shared preference
     single<SharedPreferences> {
-        // MODIFIED: Standardized SharedPreferences file name
         androidContext().getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
     }
     single<AppPreferences> { AppPreferencesImpl(prefs = get()) }
-    single<HttpClient> { createHttpClient() }
 
-    // Auth Data Dependencies
-    singleOf(::AuthApiServiceImpl) { 
-        bind<AuthApiService>()
-        bind<TokenRefresher>()
-    }
-    
-    single<AuthRepository> { AuthRepositoryImpl(authApiService = get(), appPreferences = get()) }
+    // Repository
+    singleOf(::AuthRepositoryImpl) { bind<AuthRepository>() }
 
-    // Auth Domain Dependencies
-    factory { SignupUseCase(authRepository = get()) } 
+    // UseCases
+    singleOf(::SigninUseCase)
+    singleOf(::SignupUseCase)
 
-    // Auth UI Dependencies (ViewModels)
-    viewModel { SignupViewModel(signupUseCase = get<SignupUseCase>()) } 
+    // view model
+    viewModel { SigninViewModel(get()) }
+    viewModel { SignupViewModel(get()) }
 
-    // Signin UseCase
-    factory { SigninUseCase(authRepository = get()) }
+    // Api service
+    singleOf(::AuthApiServiceImpl) { bind<AuthApiService>() }
 
-    // Signin view model
-    viewModel { SigninViewModel(signinUseCase = get<SigninUseCase>()) }
+
 
 }
