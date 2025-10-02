@@ -41,7 +41,6 @@ sealed class SigninEffect : ViewEffect { // Base class is ViewEffect
 // --- Signup ---
 data class SignupState(
     val isLoading: Boolean = false,
-    val error: String? = null, // General API error
     val fullName: String = "",
     val email: String = "",
     val password: String = "",
@@ -57,6 +56,7 @@ data class SignupState(
     val phoneError: String? = null,
     val fellowshipError: String? = null,
     val roleError: String? = null,
+    val error: String? = null, // General API error
 
     val user: User? = null,
 

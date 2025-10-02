@@ -8,7 +8,7 @@ sealed class Failure {
     object NetworkError : Failure()
     object ServerError : Failure()
     data class AuthError(val message: String) : Failure()
-    object Unknown : Failure()
+    data class Unknown(val t: Throwable) : Failure()
 
     /**
      * Human-friendly message suitable for displaying to users / logs.
@@ -18,7 +18,7 @@ sealed class Failure {
         is Failure.NetworkError -> "Network error. Please check your connection."
         is Failure.ServerError -> "Server error. Please try again."
         is Failure.AuthError -> this.message
-        is Failure.Unknown -> "An unexpected error occurred."
+        is Failure.Unknown -> this.t.message ?: "An unexpected error occurred."
     }
 
     companion object {
@@ -26,7 +26,7 @@ sealed class Failure {
             e.message?.contains("network", ignoreCase = true) == true -> NetworkError
             e.message?.contains("401") == true -> AuthError("Unauthorized")
             e.message?.contains("500") == true -> ServerError
-            else -> Unknown
+            else -> Unknown(e)
         }
     }
 }

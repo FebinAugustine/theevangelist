@@ -13,6 +13,11 @@ android {
 
 dependencies {
     implementation(libs.androidx.material3)
+
+    // android context
+    implementation(libs.androidx.core.ktx)
+
+
     // Ktor
     implementation(libs.ktor.client.core)
     implementation(libs.ktor.client.content.negotiation)

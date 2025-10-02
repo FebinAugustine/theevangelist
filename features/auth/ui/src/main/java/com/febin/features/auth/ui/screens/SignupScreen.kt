@@ -76,191 +76,224 @@ fun SignupScreen(
         }
     }
 
-    Scaffold(
-        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
-        containerColor = Color(0xFFE1E1E1) // Lighter gray background
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.primary)
+            .verticalScroll(rememberScrollState()),
+        verticalArrangement = Arrangement.Bottom,
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Column(
+        Image(
+            painter = painterResource(id = R.drawable.theevangelist_logo),
+            contentDescription = "App Logo",
+            contentScale = ContentScale.Fit,
             modifier = Modifier
-                .fillMaxSize()
-                .background(MaterialTheme.colorScheme.surface)
-                .padding(it)
-                .padding(0.dp),
-            verticalArrangement = Arrangement.Bottom,
-            horizontalAlignment = Alignment.CenterHorizontally,
-           
+                .size(180.dp),
+        )
+        Text(
+            text = "The Evangelist",
+            style = MaterialTheme.typography.headlineMedium,
+            color = MaterialTheme.colorScheme.onPrimary,
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        Card(
+            modifier = Modifier.fillMaxWidth().fillMaxHeight(1f),
+            shape = RoundedCornerShape(
+                topStart = 70.dp,
+                topEnd = 70.dp,
+                bottomStart = 0.dp,  // No bottom radius
+                bottomEnd = 0.dp
+            ),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.onPrimary
+            )
+
         ) {
-            Card(
+            Column(
                 modifier = Modifier
+                    .padding(0.dp)
                     .fillMaxWidth()
-                    .padding(bottom = 0.dp) // Adjusted padding for scroll
-                    .shadow(5.dp),
-                shape = RoundedCornerShape(
-                    topStart = 20.dp,
-                    topEnd = 20.dp,
-                    bottomStart = 0.dp,  // No bottom radius
-                    bottomEnd = 0.dp
-                ),
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surface // White background for Card
+                    .padding(start = 20.dp, end = 20.dp, top = 32.dp, bottom = 32.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ){
+                Text(
+                    text = "Sign Up",
+                    style = MaterialTheme.typography.headlineMedium
                 )
-            ) {
-                Column(
-                    modifier = Modifier
-                        .padding(24.dp)
-                        .fillMaxWidth()
-                        .verticalScroll(rememberScrollState()), // Added scroll for multiple inputs
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(12.dp) // Adjusted spacing
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                FormInput(
+                    value = state.fullName,
+                    onValueChange = { viewModel.sendIntent(SignupIntent.FullNameChanged(it)) },
+                    label = "Full Name",
+                    placeholder = "Enter your full name",
+                    leadingIcon = Icons.Filled.Person,
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+                    modifier = Modifier.fillMaxWidth(),
+                    errorMessage = state.fullNameError // ADDED
+                )
+                FormInput(
+                    value = state.email,
+                    onValueChange = { viewModel.sendIntent(SignupIntent.EmailChanged(it)) },
+                    label = "Email",
+                    placeholder = "Enter your email",
+                    leadingIcon = Icons.Filled.Email,
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Email,
+                        imeAction = ImeAction.Next
+                    ),
+                    modifier = Modifier.fillMaxWidth(),
+                    errorMessage = state.emailError // ADDED
+                )
+
+                FormInput(
+                    value = state.password,
+                    onValueChange = { viewModel.sendIntent(SignupIntent.PasswordChanged(it)) },
+                    label = "Password",
+                    placeholder = "Create a password",
+                    leadingIcon = Icons.Filled.Lock,
+                    isPasswordToggleEnabled = true,
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Password,
+                        imeAction = ImeAction.Next
+                    ),
+                    modifier = Modifier.fillMaxWidth(),
+                    errorMessage = state.passwordError // ADDED
+                )
+
+                FormInput(
+                    value = state.phone,
+                    onValueChange = { viewModel.sendIntent(SignupIntent.PhoneChanged(it)) },
+                    label = "Phone Number",
+                    placeholder = "Enter your phone number",
+                    leadingIcon = Icons.Filled.Phone,
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Phone,
+                        imeAction = ImeAction.Next
+                    ),
+                    modifier = Modifier.fillMaxWidth(),
+                    errorMessage = state.phoneError // ADDED
+                )
+
+                ExposedDropdownMenuBox(
+                    expanded = fellowshipExpanded,
+                    onExpandedChange = { fellowshipExpanded = !fellowshipExpanded },
+                    modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text(
-                        text = "Sign Up",
-                        style = MaterialTheme.typography.headlineMedium
-                    )
-                    Spacer(modifier = Modifier.height(12.dp))
-
                     FormInput(
-                        value = state.fullName,
-                        onValueChange = { viewModel.sendIntent(SignupIntent.FullNameChanged(it)) },
-                        label = "Full Name",
-                        placeholder = "Enter your full name",
-                        leadingIcon = Icons.Filled.Person,
-                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
-                        modifier = Modifier.fillMaxWidth(),
-                        errorMessage = state.fullNameError // ADDED
-                    )
-                    FormInput(
-                        value = state.email,
-                        onValueChange = { viewModel.sendIntent(SignupIntent.EmailChanged(it)) },
-                        label = "Email",
-                        placeholder = "Enter your email",
-                        leadingIcon = Icons.Filled.Email,
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email, imeAction = ImeAction.Next),
-                        modifier = Modifier.fillMaxWidth(),
-                        errorMessage = state.emailError // ADDED
-                    )
-
-                    FormInput(
-                        value = state.password,
-                        onValueChange = { viewModel.sendIntent(SignupIntent.PasswordChanged(it)) },
-                        label = "Password",
-                        placeholder = "Create a password",
-                        leadingIcon = Icons.Filled.Lock,
-                        isPasswordToggleEnabled = true,
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Next),
-                        modifier = Modifier.fillMaxWidth(),
-                        errorMessage = state.passwordError // ADDED
-                    )
-
-                    FormInput(
-                        value = state.phone,
-                        onValueChange = { viewModel.sendIntent(SignupIntent.PhoneChanged(it)) },
-                        label = "Phone Number",
-                        placeholder = "Enter your phone number",
-                        leadingIcon = Icons.Filled.Phone,
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone, imeAction = ImeAction.Next),
-                        modifier = Modifier.fillMaxWidth(),
-                        errorMessage = state.phoneError // ADDED
-                    )
-
-
-                    ExposedDropdownMenuBox(
-                        expanded = fellowshipExpanded,
-                        onExpandedChange = { fellowshipExpanded = !fellowshipExpanded },
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        FormInput(
-                            value = state.fellowship,
-                            onValueChange = { viewModel.sendIntent(SignupIntent.FellowshipChanged(it)) },
-                            label = "Fellowship Name",
-                            placeholder = "Select or type fellowship",
-                            leadingIcon = Icons.Filled.Group,
-                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = fellowshipExpanded) },
-                            readOnly = false, 
-                            modifier = Modifier.menuAnchor().fillMaxWidth(),
-                            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
-                            errorMessage = state.fellowshipError // ADDED
-                        )
-                        ExposedDropdownMenu(
-                            expanded = fellowshipExpanded,
-                            onDismissRequest = { fellowshipExpanded = false }
-                        ) {
-                            fellowshipOptions.forEach {
-                                    selectionOption ->
-                                DropdownMenuItem(
-                                    text = { Text(selectionOption) },
-                                    onClick = {
-                                        viewModel.sendIntent(SignupIntent.FellowshipChanged(selectionOption))
-                                        fellowshipExpanded = false
-                                    }
+                        value = state.fellowship,
+                        onValueChange = {
+                            viewModel.sendIntent(
+                                SignupIntent.FellowshipChanged(
+                                    it
                                 )
-                            }
-                        }
-                    }
-                    ExposedDropdownMenuBox(
-                        expanded = roleExpanded,
-                        onExpandedChange = { roleExpanded = !roleExpanded },
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        FormInput(
-                            value = state.role,
-                            onValueChange = { viewModel.sendIntent(SignupIntent.RoleChanged(it)) },
-                            label = "User Role",
-                            placeholder = "Select your role",
-                            leadingIcon = Icons.Filled.AccountCircle,
-                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = roleExpanded) },
-                            readOnly = true, 
-                            modifier = Modifier.menuAnchor().fillMaxWidth(),
-                            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-                            errorMessage = state.roleError // ADDED
-                        )
-                        ExposedDropdownMenu(
-                            expanded = roleExpanded,
-                            onDismissRequest = { roleExpanded = false }
-                        ) {
-                            roleOptions.forEach {
-                                    selectionOption ->
-                                DropdownMenuItem(
-                                    text = { Text(selectionOption) },
-                                    onClick = {
-                                        viewModel.sendIntent(SignupIntent.RoleChanged(selectionOption))
-                                        roleExpanded = false
-                                    }
-                                )
-                            }
-                        }
-                    }
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    FormButton(
-                        text = "Sign Up",
-                        onClick = { viewModel.sendIntent(SignupIntent.SignupClicked) },
-                        enabled = !state.isLoading,
-                        modifier = Modifier.fillMaxWidth().height(50.dp),
-                    ) {
-                        if (state.isLoading) {
-                            CircularProgressIndicator(modifier = Modifier.size(24.dp), color = Color.White)
-                        } else {
-                            Text("Sign Up", fontSize=20.sp)
-                        }
-                    }
-
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    Text(
-                        text = buildAnnotatedString {
-                            append("Already have an account? ")
-                            withStyle(style = SpanStyle(fontWeight = FontWeight.Bold, color = Color(0xFF00008B))) {
-                                append("Sign In")
-                            }
+                            )
                         },
-                        modifier = Modifier.clickable { onNavigateToLogin() }
+                        label = "Fellowship Name",
+                        placeholder = "Select or type fellowship",
+                        leadingIcon = Icons.Filled.Group,
+                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = fellowshipExpanded) },
+                        readOnly = false,
+                        modifier = Modifier.menuAnchor().fillMaxWidth(),
+                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+                        errorMessage = state.fellowshipError // ADDED
                     )
-                    Spacer(modifier = Modifier.height(42.dp))
+                    ExposedDropdownMenu(
+                        expanded = fellowshipExpanded,
+                        onDismissRequest = { fellowshipExpanded = false }
+                    ) {
+                        fellowshipOptions.forEach { selectionOption ->
+                            DropdownMenuItem(
+                                text = { Text(selectionOption) },
+                                onClick = {
+                                    viewModel.sendIntent(
+                                        SignupIntent.FellowshipChanged(
+                                            selectionOption
+                                        )
+                                    )
+                                    fellowshipExpanded = false
+                                }
+                            )
+                        }
+                    }
                 }
+
+                ExposedDropdownMenuBox(
+                    expanded = roleExpanded,
+                    onExpandedChange = { roleExpanded = !roleExpanded },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    FormInput(
+                        value = state.role,
+                        onValueChange = { viewModel.sendIntent(SignupIntent.RoleChanged(it)) },
+                        label = "User Role",
+                        placeholder = "Select your role",
+                        leadingIcon = Icons.Filled.AccountCircle,
+                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = roleExpanded) },
+                        readOnly = true,
+                        modifier = Modifier.menuAnchor().fillMaxWidth(),
+                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                        errorMessage = state.roleError // ADDED
+                    )
+                    ExposedDropdownMenu(
+                        expanded = roleExpanded,
+                        onDismissRequest = { roleExpanded = false }
+                    ) {
+                        roleOptions.forEach { selectionOption ->
+                            DropdownMenuItem(
+                                text = { Text(selectionOption) },
+                                onClick = {
+                                    viewModel.sendIntent(
+                                        SignupIntent.RoleChanged(
+                                            selectionOption
+                                        )
+                                    )
+                                    roleExpanded = false
+                                }
+                            )
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                FormButton(
+                    text = "Sign Up",
+                    onClick = { viewModel.sendIntent(SignupIntent.SignupClicked) },
+                    enabled = !state.isLoading,
+                    modifier = Modifier.fillMaxWidth().height(50.dp),
+                ) {
+                    if (state.isLoading) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(24.dp),
+                            color = Color.White
+                        )
+                    } else {
+                        Text("Sign Up", fontSize = 20.sp)
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(4.dp))
+
+                Text(
+                    text = buildAnnotatedString {
+                        append("Already have an account? ")
+                        withStyle(
+                            style = SpanStyle(
+                                fontWeight = FontWeight.Bold,
+                                color = Color(0xFF00008B)
+                            )
+                        ) {
+                            append("Sign In")
+                        }
+                    },
+                    modifier = Modifier.clickable { onNavigateToLogin() }
+                )
+                Spacer(modifier = Modifier.height(32.dp))
             }
         }
-
     }
 }

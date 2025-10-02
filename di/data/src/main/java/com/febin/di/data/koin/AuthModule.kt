@@ -5,7 +5,9 @@ import android.content.SharedPreferences
 import com.febin.core.data.local.AppPreferences
 import com.febin.core.data.local.AppPreferencesImpl
 import com.febin.core.data.network.createHttpClient
-import com.febin.core.domain.auth.TokenRefresher 
+import com.febin.core.data.utils.NetworkCheckerImpl
+import com.febin.core.domain.auth.TokenRefresher
+import com.febin.core.domain.utils.NetworkChecker
 import com.febin.features.auth.data.remote.services.AuthApiService
 import com.febin.features.auth.data.remote.services.AuthApiServiceImpl
 import com.febin.features.auth.data.repository.AuthRepositoryImpl
@@ -36,11 +38,13 @@ val authModule = module {
     singleOf(::SignupUseCase)
 
     // view model
-    viewModel { SigninViewModel(get()) }
+    viewModel { SigninViewModel(get(), get()) }
     viewModel { SignupViewModel(get()) }
 
     // Api service
     singleOf(::AuthApiServiceImpl) { bind<AuthApiService>() }
+
+
 
 
 

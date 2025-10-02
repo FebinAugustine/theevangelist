@@ -10,8 +10,9 @@ import com.febin.features.auth.ui.screens.SignupScreen
 
 fun NavGraphBuilder.authNavGraph(
     navController: NavController,
-    onAuthComplete: (userId: String) -> Unit, // MODIFIED: Generic callback with userId
-    onNavigateToForgotPassword: () -> Unit   // ADDED: Callback for forgot password
+    onNavigateToUserDashboard: (userId: String) -> Unit,
+    onNavigateToAdminDashboard: (userId: String) -> Unit,
+    onNavigateToForgotPassword: () -> Unit
 ) {
     navigation(
         startDestination = AuthNavRoutes.Signin.route,
@@ -20,12 +21,8 @@ fun NavGraphBuilder.authNavGraph(
         composable(AuthNavRoutes.Signin.route) {
             SigninScreen(
                 // ViewModel is koinInjectable within SigninScreen
-                onNavigateToUserDashboard = { userId -> 
-                    onAuthComplete(userId) // Pass userId up
-                },
-                onNavigateToAdminDashboard = { userId ->
-                    onAuthComplete(userId) // Pass userId up
-                },
+                onNavigateToUserDashboard = onNavigateToUserDashboard,
+                onNavigateToAdminDashboard = onNavigateToAdminDashboard,
                 onNavigateToSignup = {
                     navController.navigate(AuthNavRoutes.Signup.route)
                 },

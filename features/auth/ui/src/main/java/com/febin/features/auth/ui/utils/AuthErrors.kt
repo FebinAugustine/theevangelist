@@ -27,15 +27,7 @@ fun mapCoreFailureToAuthError(core: CoreFailure): AuthError {
         is CoreFailure.NetworkError -> AuthError.NetworkUnavailable
         is CoreFailure.AuthError -> AuthError.ValidationError(core.message)
         is CoreFailure.ServerError -> AuthError.Unexpected("Server error. Please try again.")
-        is CoreFailure.Unknown -> AuthError.Unexpected(core.toString())
-        else -> {
-            // fallback: try to read a `message` prop via reflection (safe)
-            val reflected: String? = try {
-                val f = core?.javaClass?.getDeclaredField("message")
-                f?.isAccessible = true
-                f?.get(core) as? String
-            } catch (_: Exception) { null }
-            if (!reflected.isNullOrBlank()) AuthError.Unexpected(reflected) else AuthError.Unexpected(core.toString())
-        }
+        is CoreFailure.Unknown -> AuthError.Unexpected(core.t.message ?: "An unknown error occurred.")
+        else -> AuthError.Unexpected("An unexpected error occurred.")
     }
 }

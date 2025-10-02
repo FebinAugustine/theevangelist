@@ -17,6 +17,7 @@ import com.febin.core.ui.screens.SplashScreen
 import com.febin.di.data.SharedPreferencesManager // Assuming this wraps AppPreferences
 import com.febin.features.auth.ui.navigation.AuthNavRoutes // For ForgotPassword placeholder
 import com.febin.features.auth.ui.navigation.authNavGraph
+import com.febin.features.userdashboard.ui.screens.UserDashboardScreen
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
@@ -92,45 +93,28 @@ fun AppNavGraph() {
 
         authNavGraph(
             navController = navController,
-            onAuthComplete = { userId ->
-                // userId is available from SigninScreen, can be used if dashboards need it directly.
-                Timber.d("AppNavGraph - Auth Complete. UserID: $userId. Fetching role.")
-                val role = prefsManager.getCurrentRole() // Role saved during sign-in by AuthRepositoryImpl
-                currentRole = role // Update local state if needed
-                Timber.d("AppNavGraph - Auth Complete. Role from Prefs: $role")
-                if (role != null) {
-                    when (role.uppercase()) {
-                        "SUPER_ADMIN" -> navController.navigate(NavRoutes.Sadb.route) {
-                            popUpTo(NavRoutes.Auth.route) { inclusive = true } // Clear Auth flow
-                        }
-                        else -> navController.navigate(NavRoutes.UserDashboard.route) {
-                            popUpTo(NavRoutes.Auth.route) { inclusive = true } // Clear Auth flow
-                        }
-                    }
-                } else {
-                    // Fallback: Should ideally not happen if sign-in was successful and role was saved.
-                    Timber.e("AppNavGraph - Auth Complete: Role is null after auth. Navigating to Splash.")
-                    navController.navigate(NavRoutes.Splash.route) { 
-                        popUpTo(NavRoutes.Auth.route) { inclusive = true }
-                    }
+            onNavigateToUserDashboard = {
+                navController.navigate(NavRoutes.UserDashboard.route) {
+                    popUpTo(NavRoutes.Auth.route) { inclusive = true }
+                }
+            },
+            onNavigateToAdminDashboard = {
+                navController.navigate(NavRoutes.Sadb.route) {
+                    popUpTo(NavRoutes.Auth.route) { inclusive = true }
                 }
             },
             onNavigateToForgotPassword = {
                 Timber.d("AppNavGraph: Navigate to Forgot Password triggered.")
-                // Assuming ForgotPasswordScreen is part of authNavGraph and AuthNavRoutes.ForgotPassword exists
                 // navController.navigate(AuthNavRoutes.ForgotPassword.route)
-                // TODO: Define ForgotPasswordScreen and its route in AuthNavGraph if not already present.
-                // For now, this might be a no-op if the route isn't defined in authNavGraph.
             }
         )
 
         composable(NavRoutes.UserDashboard.route) {
-            // TODO: Replace with actual UserDashboardScreen(navController, userId (optional))
-            Text("User Dashboard Screen") 
+            UserDashboardScreen(mainNavController = navController)
         }
         composable(NavRoutes.Sadb.route) {
             // TODO: Replace with actual SadbScreen(navController, userId (optional))
-            Text("Super Admin (SADB) Dashboard Screen")
+            
         }
     }
 }

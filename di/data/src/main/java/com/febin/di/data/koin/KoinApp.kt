@@ -20,7 +20,8 @@ fun initKoin(
             listOf(
                 appModule,
                 coreDataModule,
-                authModule
+                authModule,
+                networkModule
             )
         )
     }

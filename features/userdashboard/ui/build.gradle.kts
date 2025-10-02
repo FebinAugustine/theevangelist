@@ -34,4 +34,8 @@ dependencies {
     implementation(libs.androidx.compose.material.icons.core)
     implementation(libs.androidx.compose.material.icons.extended)
 
+    // Project level dependencies
+    implementation(project(":core:domain"))
+
 }
+

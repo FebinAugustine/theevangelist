@@ -10,6 +10,8 @@ import com.febin.features.auth.domain.useCases.SignupUseCase
 import com.febin.features.auth.ui.stateIntentEffect.SignupEffect
 import com.febin.features.auth.ui.stateIntentEffect.SignupIntent
 import com.febin.features.auth.ui.stateIntentEffect.SignupState
+import com.febin.features.auth.ui.utils.SigninValidator
+import com.febin.features.auth.ui.utils.SignupValidator
 import com.febin.features.auth.ui.utils.mapCoreFailureToAuthError
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -37,17 +39,17 @@ class SignupViewModel(private val signupUseCase: SignupUseCase): ViewModel() {
         viewModelScope.launch {
             intent.collectLatest {intent ->
                 when(intent) {
-                    is SignupIntent.FullNameChanged -> _state.value = _state.value.copy(fullName = intent.fullName, error = null)
+                    is SignupIntent.FullNameChanged -> _state.value = _state.value.copy(fullName = intent.fullName, fullNameError = null)
 
-                    is SignupIntent.EmailChanged -> _state.value = _state.value.copy(email = intent.email, error = null)
+                    is SignupIntent.EmailChanged -> _state.value = _state.value.copy(email = intent.email, emailError = null)
 
-                    is SignupIntent.PasswordChanged -> _state.value = _state.value.copy(password = intent.password, error = null)
+                    is SignupIntent.PasswordChanged -> _state.value = _state.value.copy(password = intent.password, passwordError = null)
 
-                    is SignupIntent.PhoneChanged -> _state.value = _state.value.copy(phone = intent.phone, error = null)
+                    is SignupIntent.PhoneChanged -> _state.value = _state.value.copy(phone = intent.phone, phoneError = null)
 
-                    is SignupIntent.FellowshipChanged -> _state.value = _state.value.copy(fellowship = intent.fellowship, error = null)
+                    is SignupIntent.FellowshipChanged -> _state.value = _state.value.copy(fellowship = intent.fellowship, fellowshipError = null)
 
-                    is SignupIntent.RoleChanged -> _state.value = _state.value.copy(role = intent.role, error = null)
+                    is SignupIntent.RoleChanged -> _state.value = _state.value.copy(role = intent.role, roleError = null)
 
                     is SignupIntent.ClearError -> _state.value = _state.value.copy(error = null)
                     is SignupIntent.SignupClicked -> callSignup()
@@ -59,26 +61,23 @@ class SignupViewModel(private val signupUseCase: SignupUseCase): ViewModel() {
     private fun callSignup() {
         viewModelScope.launch {
             val currentState = _state.value
+            val fullNameError = SignupValidator().validateFullName(currentState.fullName)
+            val emailError = SignupValidator().validateEmail(currentState.email)
+            val passwordError = SignupValidator().validatePassword(currentState.password)
+            val phoneError = SignupValidator().validatePhone(currentState.phone)
+            val fellowshipError = SignupValidator().validateFellowship(currentState.fellowship)
+            val roleError = SignupValidator().validateRole(currentState.role)
 
-            // --- Inline simple validation (returns early with unified AuthError) ---
-            fun failValidation(msg: String) {
-                _state.value = _state.value.copy(
-                    isLoading = false,
-                    error = msg // a plain string field your UI already reads (state.error)
-                )
-            }
+            _state.value = currentState.copy(
+                fullNameError = fullNameError,
+                emailError = emailError,
+                passwordError = passwordError,
+                phoneError = phoneError,
+                fellowshipError = fellowshipError,
+                roleError = roleError,
+                isLoading = false
+            )
 
-            if (currentState.fullName.isBlank()) return@launch failValidation("Full name cannot be empty.")
-            if (currentState.email.isBlank()) return@launch failValidation("Please enter a valid email address.")
-            if (currentState.password.isBlank() || currentState.password.length < 8) {
-                return@launch failValidation("Password must be 8+ characters and include required complexity.")
-            }
-            if (currentState.phone.isBlank()) return@launch failValidation("Please enter a valid phone number.")
-            if (currentState.fellowship.isBlank()) return@launch failValidation("Please select a fellowship.")
-            if (currentState.role.isBlank()) return@launch failValidation("Please select a role.")
-
-            // All validations passed — proceed
-            _state.value = _state.value.copy(isLoading = true, error = null)
 
             signupUseCase(
                 currentState.fullName.trim(),

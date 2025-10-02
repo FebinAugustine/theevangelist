@@ -9,6 +9,7 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -18,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.febin.core.ui.R // Changed import
 import kotlinx.coroutines.launch
@@ -33,17 +35,17 @@ fun OnboardingScreen(onOnboardingFinished: () -> Unit) {
         OnboardingPageData(
             imageRes = R.drawable.ic_launcher_playstore, // Using the playstore icon
             title = "Welcome to The Evangelist",
-            description = "Discover inspiring content and connect with a vibrant community."
+            description = "Let There Be Light"
         ),
         OnboardingPageData(
             imageRes = R.drawable.theevangelist_logo, // Changed to theevangelist_logo
-            title = "Explore Features",
-            description = "Navigate easily, save your favorites, and share with friends."
+            title = "Pave The Way",
+            description = "Make The Way Straight For Our Lord."
         ),
         OnboardingPageData(
             imageRes = R.drawable.theevangelist_logo, // Changed to theevangelist_logo
             title = "Get Started",
-            description = "Join us on this journey. Your adventure begins now!"
+            description = "Multitude Proclaims This Sathvartha"
         )
     )
 
@@ -58,8 +60,6 @@ fun OnboardingScreen(onOnboardingFinished: () -> Unit) {
             OnboardingPage(pages[pageIndex])
         }
 
-        // TODO: Implement a custom pager indicator if needed, e.g., using Row and Box.
-        // Example:
          Row(
             Modifier
                 .height(50.dp)
@@ -87,22 +87,38 @@ fun OnboardingScreen(onOnboardingFinished: () -> Unit) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             if (pagerState.currentPage < pageCount - 1) {
-                TextButton(onClick = { onOnboardingFinished() }) {
-                    Text("Skip")
+                TextButton(
+                    modifier = Modifier.fillMaxWidth()
+                        .background(MaterialTheme.colorScheme.onSurface),
+                    onClick = { onOnboardingFinished() }) {
+                    Text("Skip"
+                        , color = MaterialTheme.colorScheme.primary
+                        , style = MaterialTheme.typography.titleSmall
+                    )
                 }
-                Button(onClick = {
+                Button(
+                    modifier = Modifier.fillMaxWidth()
+                        .background(MaterialTheme.colorScheme.onSurface),
+                    onClick = {
                     scope.launch {
                         pagerState.animateScrollToPage(pagerState.currentPage + 1)
                     }
+
                 }) {
-                    Text("Next")
+                    Text("Next"
+                        , color = MaterialTheme.colorScheme.primary
+                        , style = MaterialTheme.typography.titleSmall
+                    )
                 }
             } else {
                 Button(
                     onClick = { onOnboardingFinished() },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.onSurface)
                 ) {
-                    Text("Get Started")
+                    Text("Get Started"
+                        , color = MaterialTheme.colorScheme.primary
+                        , style = MaterialTheme.typography.titleMedium
+                    )
                 }
             }
         }
@@ -120,7 +136,8 @@ fun OnboardingPage(pageData: OnboardingPageData) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = 24.dp),
+            .padding(horizontal = 24.dp)
+            .background(MaterialTheme.colorScheme.primary),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
@@ -134,13 +151,16 @@ fun OnboardingPage(pageData: OnboardingPageData) {
         Text(
             text = pageData.title,
             style = MaterialTheme.typography.headlineSmall,
-            textAlign = TextAlign.Center
+            textAlign = TextAlign.Center,
+            color = MaterialTheme.colorScheme.onPrimary
         )
         Spacer(modifier = Modifier.height(16.dp))
         Text(
             text = pageData.description,
             style = MaterialTheme.typography.bodyMedium,
-            textAlign = TextAlign.Center
+            textAlign = TextAlign.Center,
+            color = MaterialTheme.colorScheme.onPrimary
         )
     }
 }
+
