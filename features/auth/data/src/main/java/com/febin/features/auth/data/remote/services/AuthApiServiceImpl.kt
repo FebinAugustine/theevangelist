@@ -10,6 +10,7 @@ import io.ktor.client.call.body
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.bodyAsText
+import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import kotlinx.serialization.json.Json
 
@@ -35,12 +36,35 @@ class AuthApiServiceImpl(private val httpClient: HttpClient) : AuthApiService {
         }
     }
 
-    override suspend fun signin(request: SigninRequestDto): SigninResponseDto {
+//    override suspend fun signin(request: SigninRequestDto): SigninResponseDto {
+//        val response = httpClient.post("auth/signin") {
+//            setBody(request)
+//        }
+//        if (response.status == HttpStatusCode.OK) {
+//            return response.body<SigninResponseDto>()
+//        } else {
+//            val errorBody = response.bodyAsText()
+//            val errorDto = try {
+//                json.decodeFromString<ApiErrorResponseDto>(errorBody)
+//            } catch (e: Exception) {
+//                null
+//            }
+//            val message = errorDto?.message ?: errorDto?.error ?: "Invalid credentials"
+//            throw Exception(message)
+//        }
+//    }
+
+    override suspend fun signin(request: SigninRequestDto): Pair<SigninResponseDto, List<String>> {
         val response = httpClient.post("auth/signin") {
             setBody(request)
         }
+
+        // collect Set-Cookie headers (may be multiple)
+        val setCookieHeaders: List<String> = response.headers.getAll(HttpHeaders.SetCookie) ?: emptyList()
+
         if (response.status == HttpStatusCode.OK) {
-            return response.body<SigninResponseDto>()
+            val body = response.body<SigninResponseDto>()
+            return Pair(body, setCookieHeaders)
         } else {
             val errorBody = response.bodyAsText()
             val errorDto = try {

@@ -11,7 +11,7 @@ object AuthMapper {
 
     fun toDomain(signinDto: SigninResponseDto): User = User(
         id = "",  // From prefs or API if added
-        fullname = signinDto.fullname,  // Available in signin response
+        fullName = signinDto.fullname,  // Available in signin response
         email = signinDto.email,
         phone = signinDto.phone,
         fellowship = signinDto.fellowship,
@@ -20,7 +20,7 @@ object AuthMapper {
 
     fun toDomain(signupDto: SignupResponseDto): User = User(
         id = "",  // From prefs (fetch after signup)
-        fullname = "",  // Not in response—fetch from getCurrentUser
+        fullName = "",  // Not in response—fetch from getCurrentUser
         email = signupDto.email,
         phone = null,  // Not in response
         fellowship = null,  // Not in response

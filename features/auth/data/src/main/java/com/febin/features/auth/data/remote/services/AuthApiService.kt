@@ -9,6 +9,6 @@ import com.febin.features.auth.data.dto.SigninResponseDto
 
 interface AuthApiService {
     suspend fun signup(request: SignupRequestDto): SignupResponseDto // Return type changed
-    suspend fun signin(request: SigninRequestDto): SigninResponseDto
+    suspend fun signin(request: SigninRequestDto): Pair<SigninResponseDto, List<String>>
 //    suspend fun refreshToken() // Added for HttpOnly cookie refresh
 }

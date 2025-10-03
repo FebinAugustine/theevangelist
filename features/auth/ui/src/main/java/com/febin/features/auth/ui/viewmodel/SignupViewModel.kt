@@ -100,6 +100,8 @@ class SignupViewModel(private val signupUseCase: SignupUseCase): ViewModel() {
                             error = null
                         )
                         // Optionally navigate / send effect here (or let UI observe user in state)
+                        _effect.send(SignupEffect.NavigateToLogin)
+                        _effect.send(SignupEffect.ShowSuccess("Signup successful"))
                     }
 
                     is DomainResult.Failure -> {
@@ -109,6 +111,7 @@ class SignupViewModel(private val signupUseCase: SignupUseCase): ViewModel() {
                             isLoading = false,
                             error = authError.userMessage()
                         )
+                        _effect.send(SignupEffect.ShowError(authError.userMessage()))
                     }
 
                     else -> {

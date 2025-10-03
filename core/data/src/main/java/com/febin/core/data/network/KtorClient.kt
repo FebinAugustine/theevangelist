@@ -33,7 +33,7 @@ import java.net.ConnectException
 import kotlin.math.pow
 
 fun createHttpClient(appPreferences: AppPreferences) = HttpClient(Android) {
-    expectSuccess = false  // Don't auto-throw on non-2xx; handle in service
+    expectSuccess = false
 
     install(ContentNegotiation) {
         json(Json {
@@ -49,7 +49,7 @@ fun createHttpClient(appPreferences: AppPreferences) = HttpClient(Android) {
                 Timber.d("Ktor => %s", message)
             }
         }
-        level = LogLevel.ALL  // NONE in prod
+        level = LogLevel.ALL
     }
 
     install(HttpTimeout) {
@@ -59,31 +59,22 @@ fun createHttpClient(appPreferences: AppPreferences) = HttpClient(Android) {
     }
 
     install(HttpRequestRetry) {
-        // Combine response-based retry logic into a single predicate with the correct parameters.
-        retryIf { request, response ->
+        retryIf { _, response ->
             val code = response.status.value
             code in 500..599 || code == 408
         }
-
-        // Use retryOnExceptionIf which expects (request, cause) -> Boolean
-        retryOnExceptionIf { request, cause ->
+        retryOnExceptionIf { _, cause ->
             cause is ConnectException || cause is IOException
         }
-
         maxRetries = 3
-
-        // delayMillis expects a function (attempt: Int) -> Long
-        // Use attempt.toDouble() when calling pow
         delayMillis { attempt: Int ->
-            val baseDelay = 1000.0 // ms
+            val baseDelay = 1000.0
             val maxDelay = 10_000L
             val multiplier = 2.0
-            // attempt can be 0.. so pow(attempt.toDouble())
             val computed = (baseDelay * multiplier.pow(attempt.toDouble())).toLong()
             computed.coerceAtMost(maxDelay)
         }
     }
-
 
     install(Auth) {
         bearer {
@@ -95,17 +86,18 @@ fun createHttpClient(appPreferences: AppPreferences) = HttpClient(Android) {
             }
             sendWithoutRequest { request ->
                 val path = request.url.encodedPath
-                path.endsWith("/login") || path.endsWith("/register") || path.endsWith("/refresh-token")
+                val excluded = setOf("/signin", "/signup", "/refresh-token")
+                excluded.none { path.endsWith(it) }
             }
         }
     }
 
     install(HttpCallValidator) {
-        handleResponseExceptionWithRequest { cause: Throwable, request: HttpRequest ->  // Fixed: Params are Throwable, HttpRequest
+        handleResponseExceptionWithRequest { cause: Throwable, request: HttpRequest ->
             if (cause is ClientRequestException) {
-                val errorBody = cause.response.bodyAsText()  // Fixed: Use cause.response (not param)
+                val errorBody = cause.response.bodyAsText()
                 Timber.e("API Error (${cause.response.status.value}): $errorBody")
-                throw Exception(errorBody)  // Re-throw with body
+                throw Exception(errorBody)
             }
         }
     }
@@ -119,20 +111,35 @@ fun createHttpClient(appPreferences: AppPreferences) = HttpClient(Android) {
 private fun loadAuthTokens(appPreferences: AppPreferences): BearerTokens? {
     val accessToken = appPreferences.getToken()
     val refreshToken = appPreferences.getRefreshToken()
-    return if (accessToken != null && refreshToken != null) {
-        BearerTokens(accessToken, refreshToken)
-    } else null
+
+    if (accessToken.isNullOrBlank()) {
+        Timber.w("loadAuthTokens: No access token found in AppPreferences")
+        return null
+    }
+
+    Timber.d(
+        "loadAuthTokens: Access token loaded (len=${accessToken.length}), " +
+                "Refresh token present=${!refreshToken.isNullOrBlank()}"
+    )
+
+    return BearerTokens(accessToken, refreshToken ?: "")
 }
 
 private suspend fun refreshAuthTokens(client: HttpClient, appPreferences: AppPreferences): BearerTokens? {
     val refreshToken = appPreferences.getRefreshToken()
-    if (refreshToken == null) return null
+    if (refreshToken.isNullOrBlank()) {
+        Timber.w("refreshAuthTokens: No refresh token found in AppPreferences")
+        return null
+    }
 
     return try {
+        Timber.d("refreshAuthTokens: Attempting refresh with refresh token (len=${refreshToken.length})")
         val response = client.post("${Constants.BASE_URL}/refresh-token") {
             header(HttpHeaders.Authorization, "Bearer $refreshToken")
+            header(HttpHeaders.ContentType, ContentType.Application.Json)
         }
         val newTokens = response.body<RefreshResponseDto>()
+        Timber.d("refreshAuthTokens: Successfully refreshed. New access token len=${newTokens.accessToken.length}")
         appPreferences.saveTokens(newTokens.accessToken, newTokens.refreshToken)
         BearerTokens(newTokens.accessToken, newTokens.refreshToken)
     } catch (e: Exception) {

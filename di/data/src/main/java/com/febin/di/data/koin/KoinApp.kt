@@ -21,7 +21,8 @@ fun initKoin(
                 appModule,
                 coreDataModule,
                 authModule,
-                networkModule
+                networkModule,
+                userModule
             )
         )
     }

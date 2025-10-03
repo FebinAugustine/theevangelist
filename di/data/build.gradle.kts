@@ -20,6 +20,9 @@ dependencies {
     implementation(project(":features:auth:data"))
     implementation(project(":features:auth:domain"))
     implementation(project(":features:auth:ui"))
+    implementation(project(":features:userdashboard:data"))
+    implementation(project(":features:userdashboard:domain"))
+    implementation(project(":features:userdashboard:ui"))
 
 
     // Ktor clien

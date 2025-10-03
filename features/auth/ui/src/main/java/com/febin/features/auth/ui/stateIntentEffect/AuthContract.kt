@@ -72,9 +72,11 @@ sealed class SignupIntent : ViewIntent {
     data class RoleChanged(val role: String) : SignupIntent()
     data object ClearError : SignupIntent()
     object SignupClicked : SignupIntent()
+
 }
 
 sealed class SignupEffect : ViewEffect {
     object NavigateToLogin : SignupEffect()
     data class ShowError(val message: String) : SignupEffect()
+    data class ShowSuccess(val message: String) : SignupEffect()
 }

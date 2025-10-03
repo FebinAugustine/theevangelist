@@ -1,4 +1,4 @@
-package com.febin.features.userdashboard.ui.screens.screens
+package com.febin.features.userdashboard.ui.screens
 
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text

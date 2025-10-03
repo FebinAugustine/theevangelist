@@ -26,8 +26,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.febin.features.userdashboard.ui.screens.screens.ReportsScreen
-import com.febin.features.userdashboard.ui.screens.screens.SettingsScreen
 
 sealed class BottomNavItem(val route: String, val title: String, val icon: ImageVector) {
     object Home : BottomNavItem("home", "Home", Icons.Default.Home)
@@ -41,7 +39,6 @@ sealed class BottomNavItem(val route: String, val title: String, val icon: Image
 fun UserDashboardScreen(
     mainNavController: NavController // Corrected: accept NavController instance
 ) {
-
     val internalNavController = rememberNavController()
     val items = listOf(
         BottomNavItem.Home,
@@ -84,13 +81,13 @@ fun UserDashboardScreen(
             modifier = Modifier.padding(innerPadding)
         ) {
             composable(BottomNavItem.Home.route) {
-//                HomeScreen()
+                HomeScreen()
             }
             composable(BottomNavItem.Reports.route) {
                 ReportsScreen()
             }
             composable(BottomNavItem.Profile.route) {
-//                ProfileScreen(navController = mainNavController) // This now correctly passes the instance
+                ProfileScreen(navController = mainNavController) // This now correctly passes the instance
             }
             composable(BottomNavItem.Settings.route) {
                 SettingsScreen()

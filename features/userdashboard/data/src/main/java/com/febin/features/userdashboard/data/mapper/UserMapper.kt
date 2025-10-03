@@ -10,7 +10,7 @@ object UserMapper {
 
     fun toDomain(getUserDto: GetUserResponseDto): User = User(
         id = "",  // From prefs
-        fullname = getUserDto.fullName,
+        fullName = getUserDto.fullName,
         email = getUserDto.email,
         phone = getUserDto.phoneNo,
         fellowship = getUserDto.fellowship,

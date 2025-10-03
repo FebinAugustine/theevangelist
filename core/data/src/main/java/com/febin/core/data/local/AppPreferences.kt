@@ -5,7 +5,7 @@ import androidx.core.content.edit
 import timber.log.Timber // Import Timber
 
 interface AppPreferences {
-    fun saveUserInfo(userEmail: String, userType: String?, userFullname: String? = null, userFellowship: String? = null, userPhone: String? = null)
+    fun saveUserInfo(userEmail: String, userType: String?, userFullName: String? = null, userFellowship: String? = null, userPhone: String? = null)
     fun getUserEmail(): String?
     fun getUserType(): String?
     fun clearUserInfo()
@@ -78,7 +78,10 @@ class AppPreferencesImpl(private val prefs: SharedPreferences) : AppPreferences 
     }
 
     override fun saveTokens(accessToken: String, refreshToken: String?) {
-        Timber.tag(TAG).d("Saving tokens to prefs: access='$accessToken.substring(0, 10)}...', refresh='${refreshToken?.substring(0, 10)}...'")
+        Timber.tag(TAG).d(
+            "Saving tokens to prefs: access='${accessToken.substring(0, minOf(10, accessToken.length))}...', " +
+                    "refresh='${refreshToken?.let { it.substring(0, minOf(10, it.length)) } ?: "null"}...'"
+        )
         prefs.edit(commit = true) {
             putString(KEY_ACCESS_TOKEN, accessToken)
             putString(KEY_REFRESH_TOKEN, refreshToken)

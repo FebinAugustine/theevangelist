@@ -72,6 +72,11 @@ fun SignupScreen(
                     Toast.makeText(context, successMessage, Toast.LENGTH_LONG).show()
                     onNavigateToLogin()
                 }
+
+                is SignupEffect.ShowSuccess -> {
+                    Timber.tag("SignupScreen").d("Toast success: ${it.message}")
+                    Toast.makeText(context, it.message, Toast.LENGTH_LONG).show()
+                }
             }
         }
     }
