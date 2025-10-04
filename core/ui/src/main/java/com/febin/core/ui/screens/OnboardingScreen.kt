@@ -33,17 +33,17 @@ fun OnboardingScreen(onOnboardingFinished: () -> Unit) {
 
     val pages = listOf(
         OnboardingPageData(
-            imageRes = R.drawable.ic_launcher_playstore, // Using the playstore icon
+            imageRes = R.drawable.theevangelist_logo,
             title = "Welcome to The Evangelist",
             description = "Let There Be Light"
         ),
         OnboardingPageData(
-            imageRes = R.drawable.theevangelist_logo, // Changed to theevangelist_logo
+            imageRes = R.drawable.theevangelist_logo,
             title = "Pave The Way",
             description = "Make The Way Straight For Our Lord."
         ),
         OnboardingPageData(
-            imageRes = R.drawable.theevangelist_logo, // Changed to theevangelist_logo
+            imageRes = R.drawable.theevangelist_logo,
             title = "Get Started",
             description = "Multitude Proclaims This Sathvartha"
         )
@@ -56,8 +56,7 @@ fun OnboardingScreen(onOnboardingFinished: () -> Unit) {
                 .fillMaxWidth()
                 .weight(1f)
         ) {
-            pageIndex -> // pageIndex is the current page
-            OnboardingPage(pages[pageIndex])
+            pageIndex -> OnboardingPage(pages[pageIndex])
         }
 
          Row(
@@ -82,14 +81,12 @@ fun OnboardingScreen(onOnboardingFinished: () -> Unit) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 24.dp),
+                .padding(horizontal = 20.dp, vertical = 24.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
             if (pagerState.currentPage < pageCount - 1) {
                 TextButton(
-                    modifier = Modifier.fillMaxWidth()
-                        .background(MaterialTheme.colorScheme.onSurface),
                     onClick = { onOnboardingFinished() }) {
                     Text("Skip"
                         , color = MaterialTheme.colorScheme.primary
@@ -97,26 +94,23 @@ fun OnboardingScreen(onOnboardingFinished: () -> Unit) {
                     )
                 }
                 Button(
-                    modifier = Modifier.fillMaxWidth()
-                        .background(MaterialTheme.colorScheme.onSurface),
                     onClick = {
                     scope.launch {
                         pagerState.animateScrollToPage(pagerState.currentPage + 1)
                     }
-
                 }) {
                     Text("Next"
-                        , color = MaterialTheme.colorScheme.primary
+                        , color = MaterialTheme.colorScheme.onPrimary
                         , style = MaterialTheme.typography.titleSmall
                     )
                 }
             } else {
                 Button(
                     onClick = { onOnboardingFinished() },
-                    modifier = Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.onSurface)
+                    modifier = Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.primary)
                 ) {
                     Text("Get Started"
-                        , color = MaterialTheme.colorScheme.primary
+                        , color = MaterialTheme.colorScheme.onPrimary
                         , style = MaterialTheme.typography.titleMedium
                     )
                 }
@@ -137,7 +131,7 @@ fun OnboardingPage(pageData: OnboardingPageData) {
         modifier = Modifier
             .fillMaxSize()
             .padding(horizontal = 24.dp)
-            .background(MaterialTheme.colorScheme.primary),
+            ,
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
@@ -152,14 +146,14 @@ fun OnboardingPage(pageData: OnboardingPageData) {
             text = pageData.title,
             style = MaterialTheme.typography.headlineSmall,
             textAlign = TextAlign.Center,
-            color = MaterialTheme.colorScheme.onPrimary
+            color = MaterialTheme.colorScheme.primary
         )
         Spacer(modifier = Modifier.height(16.dp))
         Text(
             text = pageData.description,
-            style = MaterialTheme.typography.bodyMedium,
+            style = MaterialTheme.typography.bodyLarge,
             textAlign = TextAlign.Center,
-            color = MaterialTheme.colorScheme.onPrimary
+            color = MaterialTheme.colorScheme.primary
         )
     }
 }

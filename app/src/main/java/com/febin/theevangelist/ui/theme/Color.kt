@@ -2,7 +2,7 @@ package com.febin.theevangelist.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-val PrimaryLight = Color(0xFF0D17B7)
+val PrimaryLight = Color(0xFF1825DA)
 val OnPrimaryLight = Color(0xFFE0E8F3)
 val SecondaryLight = Color(0xFF375DD2)
 val OnSecondaryLight = Color(0xFFF7F9FA)

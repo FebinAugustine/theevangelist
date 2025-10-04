@@ -105,8 +105,8 @@ fun SignupScreen(
         Card(
             modifier = Modifier.fillMaxWidth().fillMaxHeight(1f),
             shape = RoundedCornerShape(
-                topStart = 70.dp,
-                topEnd = 70.dp,
+                topStart = 40.dp,
+                topEnd = 40.dp,
                 bottomStart = 0.dp,  // No bottom radius
                 bottomEnd = 0.dp
             ),
